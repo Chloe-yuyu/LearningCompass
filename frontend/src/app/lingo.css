@@ -84,6 +84,7 @@ body {
 .lingo-btn:hover  { transform: translateY(2px); }
 .lingo-btn:active { transform: translateY(4px); }
 .lingo-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+.lingo-btn:focus-visible { outline: 3px solid var(--primary); outline-offset: 3px; }
 
 .lingo-btn-primary {
   background: var(--primary);
@@ -117,6 +118,14 @@ body {
 }
 .lingo-btn-danger:hover  { box-shadow: 0 2px 0 var(--danger-dk); }
 .lingo-btn-danger:active { box-shadow: 0 0   0 var(--danger-dk); }
+
+.lingo-btn-white {
+  background: #fff;
+  color: var(--primary-dk);
+  box-shadow: var(--shadow-btn) var(--primary-sh);
+}
+.lingo-btn-white:hover  { box-shadow: 0 2px 0 var(--primary-sh); }
+.lingo-btn-white:active { box-shadow: 0 0   0 var(--primary-sh); }
 
 .lingo-btn-sm { font-size: 14px; padding: 9px 18px; border-radius: var(--radius-sm); }
 .lingo-btn-lg { font-size: 18px; padding: 16px 36px; border-radius: var(--radius); }
