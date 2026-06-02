@@ -34,18 +34,24 @@
 
 /* Hero */
 .hero {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 72px; background: #fff; gap: 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 72px;
+  padding-top: calc(72px + 70px);
+  background: #fff;
   border-bottom: 3px solid var(--border);
-  padding-top: calc(72px + 70px); /* 70px = navbar 高度 */
+  gap: 0;
 }
-.hero-content { flex: 1; }
+.hero-content { max-width: 680px; }
 .hero-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 800; padding: 5px 14px; border-radius: 100px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 20px; }
-.hero-content h1 { font-size: 52px; font-weight: 900; line-height: 1.1; margin-bottom: 18px; letter-spacing: -1px; }
+.hero-content h1 { font-size: 58px; font-weight: 900; line-height: 1.2; margin-bottom: 24px; letter-spacing: -1px; }
 .hero-content h1 span { color: var(--primary); }
-.hero-content p { font-size: 17px; font-weight: 600; color: var(--text-md); line-height: 1.65; margin-bottom: 32px; max-width: 460px; }
-.hero-btns { display: flex; gap: 12px; align-items: center; }
-.hero-image { flex: 1; display: flex; justify-content: center; }
+.hero-content p { font-size: 18px; font-weight: 600; color: var(--text-md); line-height: 1.7; margin-bottom: 36px; }
+.hero-btns { display: flex; gap: 12px; align-items: center; justify-content: center; }
+.hero-image { display: none; }
 
 .dashboard-preview {
   background: #fff; border-radius: var(--radius-xl); padding: 28px;
@@ -59,10 +65,113 @@
 
 /* Section */
 .section { padding: 72px; min-height: 100vh; display: flex; flex-direction: column; justify-content: center; }
-.section-header { text-align: center; margin-bottom: 52px; }
-.section-label { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 800; padding: 5px 14px; border-radius: 100px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
-.section h2 { font-size: 56px; font-weight: 900; margin-bottom: 10px; letter-spacing: -1px; }
-.section-sub { font-size: 18px; font-weight: 600; color: var(--text-md); }
+.section-header { text-align: center; margin-bottom: 64px; }
+.section-label { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 800; padding: 5px 14px; border-radius: 100px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 16px; }
+.section h2 { font-size: 56px; font-weight: 900; margin-bottom: 16px; letter-spacing: -1px; line-height: 1.15; }
+.section-sub { font-size: 18px; font-weight: 600; color: var(--text-md); line-height: 1.6; }
+
+/* ── Diamond Cards ── */
+.diamond-grid {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 24px;
+  padding: 0 48px;
+  position: relative;
+}
+
+.diamond-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  flex: 1;
+  max-width: 220px;
+}
+
+/* 奇數卡往上、偶數卡往下，形成交錯 */
+.diamond-1, .diamond-3 { margin-top: 0; }
+.diamond-2, .diamond-4 { margin-top: 80px; }
+
+/* 數字圓圈 */
+.diamond-num {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; font-weight: 900; color: #fff;
+  position: absolute; top: -24px; left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+.diamond-1 .diamond-num { background: #c4a8d8; }
+.diamond-2 .diamond-num { background: #d8a8b8; }
+.diamond-3 .diamond-num { background: #d8b898; }
+.diamond-4 .diamond-num { background: #c8c080; }
+
+/* 菱形本體 */
+.diamond-card {
+  width: 200px; height: 200px;
+  transform: rotate(45deg);
+  border-radius: 20px;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: default;
+}
+.diamond-1 .diamond-card { background: #ede8f5; box-shadow: 6px 6px 0 #d5c8e8; }
+.diamond-2 .diamond-card { background: #f5e8ec; box-shadow: 6px 6px 0 #e0c8d0; }
+.diamond-3 .diamond-card { background: #f5ebe0; box-shadow: 6px 6px 0 #e0cbb8; }
+.diamond-4 .diamond-card { background: #f5f0d8; box-shadow: 6px 6px 0 #d8d0a0; }
+
+.diamond-card:hover {
+  transform: rotate(45deg) translateY(-4px);
+  box-shadow: 8px 10px 0 rgba(0,0,0,0.12);
+}
+
+/* 菱形內文容器 — 反轉回正並置中 */
+.diamond-inner {
+  transform: rotate(-45deg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 130px;
+  gap: 6px;
+}
+
+.diamond-clip {
+  font-size: 18px;
+  opacity: 0.5;
+  line-height: 1;
+}
+
+.diamond-card h3 {
+  font-size: 13px; font-weight: 900;
+  text-align: center;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.diamond-card p {
+  font-size: 10.5px; font-weight: 600;
+  color: rgba(0,0,0,0.5);
+  text-align: center; line-height: 1.6;
+  margin: 0;
+}
+
+.diamond-badge {
+  font-size: 10px; font-weight: 900;
+  padding: 3px 10px;
+  border-radius: 100px;
+  background: rgba(255,255,255,0.7);
+  color: rgba(0,0,0,0.55);
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
 
 /* Featured card (橫式大卡) */
 .fcard-featured {
@@ -114,7 +223,7 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 
-.features-section { background: var(--bg); }
+.features-section { background: #fff; }
 .features-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -155,23 +264,75 @@
 .fcard p  { font-size: 12px; font-weight: 600; color: var(--text-md); line-height: 1.55; }
 
 /* Flow */
-.flow-section { background: #fff; border-top: 3px solid var(--border); border-bottom: 3px solid var(--border); }
-.flow-steps { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 36px; }
-.step { background: #fff; border-radius: var(--radius-lg); padding: 26px 18px; width: 180px; text-align: center; border: 3px solid var(--border); box-shadow: 0 5px 0 var(--border); position: relative; flex-shrink: 0; }
-.step-num { position: absolute; top: -13px; left: 50%; transform: translateX(-50%); width: 26px; height: 26px; background: var(--primary); color: #fff; border-radius: 50%; font-size: 13px; font-weight: 900; display: flex; align-items: center; justify-content: center; border: 2px solid var(--primary-sh); }
-.step-icon { font-size: 38px; margin-bottom: 10px; margin-top: 4px; }
-.step-svg { margin-bottom: 10px; margin-top: 8px; display:flex; justify-content:center; align-items:center; }
-.step h3 { font-size: 14px; font-weight: 900; margin-bottom: 5px; }
-.step p { font-size: 12px; font-weight: 600; color: var(--text-md); line-height: 1.5; }
-.step-arrow { font-size: 22px; color: var(--border-dk); flex-shrink: 0; font-weight: 900; }
+.flow-section { background: #fff; }
+
+.flow-timeline {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0;
+  margin-bottom: 48px;
+}
+
+.flow-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  width: 180px;
+}
+
+.flow-circle {
+  width: 96px; height: 96px;
+  border-radius: 50%;
+  border: 3px solid;
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+  margin-bottom: 20px;
+  background: #fff;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.flow-circle:hover { transform: translateY(-4px); }
+
+.flow-node-1 .flow-circle { border-color: #58cc02; box-shadow: 0 0 0 6px #e8f9d9; }
+.flow-node-2 .flow-circle { border-color: #ce82ff; box-shadow: 0 0 0 6px #f5e6ff; }
+.flow-node-3 .flow-circle { border-color: #ffc800; box-shadow: 0 0 0 6px #fff7e0; }
+.flow-node-4 .flow-circle { border-color: #ff4b4b; box-shadow: 0 0 0 6px #ffe4e4; }
+
+.flow-badge {
+  position: absolute;
+  top: -6px; right: -6px;
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  font-size: 12px; font-weight: 900; color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  border: 2px solid #fff;
+}
+.flow-node-1 .flow-badge { background: #58cc02; }
+.flow-node-2 .flow-badge { background: #ce82ff; }
+.flow-node-3 .flow-badge { background: #ffc800; }
+.flow-node-4 .flow-badge { background: #ff4b4b; }
+
+.flow-node h3 { font-size: 16px; font-weight: 900; margin-bottom: 10px; }
+.flow-node p  { font-size: 13px; font-weight: 600; color: var(--text-md); line-height: 1.6; padding: 0 12px; }
+
+.flow-connector {
+  font-size: 24px; font-weight: 900;
+  color: var(--border-dk);
+  margin-top: 36px;
+  padding: 0 8px;
+  flex-shrink: 0;
+  user-select: none;
+}
+
 .flow-tip { background: var(--primary-bg); border: 2px solid var(--primary-bd); border-left: 5px solid var(--primary); padding: 14px 20px; border-radius: var(--radius); font-size: 14px; font-weight: 700; color: var(--primary-dk); max-width: 760px; margin: 0 auto; }
 
 /* About */
 .about-section { background: var(--bg); }
 .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; max-width: 980px; margin: 0 auto; }
 .about-card { background: #fff; border-radius: var(--radius-lg); padding: 30px; border: 3px solid var(--border); box-shadow: 0 5px 0 var(--border); }
-.about-card h3 { font-size: 17px; font-weight: 900; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
-.about-card p { font-size: 14px; font-weight: 600; color: var(--text-md); line-height: 1.7; }
+.about-card h3 { font-size: 17px; font-weight: 900; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+.about-card p { font-size: 14px; font-weight: 600; color: var(--text-md); line-height: 1.8; }
 .team-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; margin-top: 14px; }
 .member { text-align: center; padding: 14px 8px; background: var(--bg); border-radius: var(--radius); border: 2px solid var(--border); }
 .member-avatar { font-size: 26px; margin-bottom: 4px; }
