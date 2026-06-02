@@ -1,0 +1,66 @@
+<div class="auth-page">
+  <nav class="auth-nav">
+    <div class="auth-nav-logo" routerLink="/"><span>🧭</span><span>Learning Compass</span></div>
+    <a class="auth-nav-back" routerLink="/">← 回到首頁</a>
+  </nav>
+
+  <div class="auth-layout">
+    <div class="auth-left" style="background: linear-gradient(145deg,#e8d4ff,#c97aff,#ce82ff)">
+      <div class="auth-illustration" style="animation-delay:0.5s">🚀</div>
+      <h2>加入我們！</h2>
+      <p>建立帳號，開始你的 AI 智慧學習體驗</p>
+    </div>
+    <div class="auth-right">
+      <div class="auth-card">
+        <h2>免費註冊</h2>
+
+        <div class="auth-field">
+          <label class="lingo-label">姓名</label>
+          <div class="lingo-input-wrap">
+            <span>👤</span>
+            <input type="text" [(ngModel)]="name" placeholder="請輸入你的姓名">
+          </div>
+        </div>
+
+        <div class="auth-field">
+          <label class="lingo-label">電子郵件</label>
+          <div class="lingo-input-wrap">
+            <span>✉️</span>
+            <input type="email" [(ngModel)]="email" placeholder="請輸入電子郵件">
+          </div>
+        </div>
+
+        <div class="auth-field">
+          <label class="lingo-label">密碼</label>
+          <div class="lingo-input-wrap">
+            <span>🔒</span>
+            <input [type]="showPassword ? 'text' : 'password'" [(ngModel)]="password" placeholder="至少 6 個字元">
+            <span class="auth-toggle" (click)="showPassword = !showPassword">{{ showPassword ? '隱藏' : '顯示' }}</span>
+          </div>
+        </div>
+
+        <div class="auth-field">
+          <label class="lingo-label">確認密碼</label>
+          <div class="lingo-input-wrap">
+            <span>🔒</span>
+            <input [type]="showConfirm ? 'text' : 'password'" [(ngModel)]="confirmPassword"
+                   placeholder="再次輸入密碼" (keyup.enter)="register()">
+            <span class="auth-toggle" (click)="showConfirm = !showConfirm">{{ showConfirm ? '隱藏' : '顯示' }}</span>
+          </div>
+        </div>
+
+        <div *ngIf="successMsg" class="auth-success">✅ {{ successMsg }}</div>
+
+        <button class="lingo-btn lingo-btn-primary lingo-btn-lg" style="width:100%;background:var(--secondary);box-shadow:0 4px 0 var(--secondary-dk)"
+                (click)="register()" [disabled]="loading">
+          <mat-spinner *ngIf="loading" diameter="20"></mat-spinner>
+          {{ loading ? '註冊中...' : '建立帳號 🎉' }}
+        </button>
+
+        <p class="auth-switch">已有帳號？<a routerLink="/login">立即登入</a></p>
+      </div>
+    </div>
+  </div>
+
+  <footer class="auth-footer">© 2026 Learning Compass・世新大學資訊管理學系第33屆畢業專題</footer>
+</div>

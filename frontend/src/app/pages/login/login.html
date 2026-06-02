@@ -1,0 +1,49 @@
+<div class="auth-page">
+  <nav class="auth-nav">
+    <div class="auth-nav-logo" routerLink="/"><span>🧭</span><span>Learning Compass</span></div>
+    <a class="auth-nav-back" routerLink="/">← 回到首頁</a>
+  </nav>
+
+  <div class="auth-layout">
+    <div class="auth-left">
+      <div class="auth-illustration">📚</div>
+      <h2>歡迎回來！</h2>
+      <p>登入帳號，繼續你的智慧學習之旅</p>
+    </div>
+    <div class="auth-right">
+      <div class="auth-card">
+        <h2>登入</h2>
+
+        <div class="auth-field">
+          <label class="lingo-label">電子郵件</label>
+          <div class="lingo-input-wrap">
+            <span>✉️</span>
+            <input type="email" [(ngModel)]="email" placeholder="請輸入電子郵件">
+          </div>
+        </div>
+
+        <div class="auth-field">
+          <label class="lingo-label">密碼</label>
+          <div class="lingo-input-wrap">
+            <span>🔒</span>
+            <input [type]="showPassword ? 'text' : 'password'" [(ngModel)]="password"
+                   placeholder="請輸入密碼" (keyup.enter)="login()">
+            <span class="auth-toggle" (click)="showPassword = !showPassword">
+              {{ showPassword ? '隱藏' : '顯示' }}
+            </span>
+          </div>
+        </div>
+
+        <button class="lingo-btn lingo-btn-primary lingo-btn-lg" style="width:100%"
+                (click)="login()" [disabled]="loading">
+          <mat-spinner *ngIf="loading" diameter="20"></mat-spinner>
+          {{ loading ? '登入中...' : '登入 →' }}
+        </button>
+
+        <p class="auth-switch">還沒有帳號？<a routerLink="/register">立即免費註冊</a></p>
+      </div>
+    </div>
+  </div>
+
+  <footer class="auth-footer">© 2026 Learning Compass・世新大學資訊管理學系第33屆畢業專題</footer>
+</div>

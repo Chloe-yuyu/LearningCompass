@@ -24,3 +24,5 @@ Thumbs.db
 
 # Firebase credentials
 backend/firebase_key.json
+
+frontend/node_modules/

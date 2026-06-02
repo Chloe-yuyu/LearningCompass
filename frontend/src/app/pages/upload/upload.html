@@ -1,0 +1,71 @@
+<div class="page-layout">
+  <app-navbar></app-navbar>
+  <div class="body-layout">
+    <app-sidenav></app-sidenav>
+    <main class="main-content">
+
+      <div class="top-bar">
+        <div>
+          <h2>上傳教材</h2>
+          <p>上傳你的教材檔案，AI 將自動分析並處理，幫助你更有效率地學習。</p>
+        </div>
+      </div>
+
+      <div class="upload-layout">
+        <div class="upload-main">
+
+          <div class="drop-zone" (click)="fileInput.click()">
+            <div class="drop-icon">☁️</div>
+            <p class="drop-title" *ngIf="!selectedFile">拖曳檔案到這裡，或<span class="link">點擊選擇檔案</span></p>
+            <p class="drop-title" *ngIf="selectedFile">✅ {{ selectedFile.name }}</p>
+            <p class="drop-sub">支援 PDF、Word、TXT 等檔案格式</p>
+            <button class="btn-select">＋ 選擇檔案</button>
+            <p class="drop-limit">單一檔案大小上限 100MB</p>
+          </div>
+
+          <input #fileInput type="file" hidden
+                 accept=".pdf,.docx,.txt,.md"
+                 (change)="onFileSelected($event)">
+
+          <div class="format-grid">
+            <div class="format-card"><div class="format-icon pdf">PDF</div><div class="format-name">PDF</div><div class="format-ext">.pdf</div></div>
+            <div class="format-card"><div class="format-icon word">W</div><div class="format-name">Word</div><div class="format-ext">.doc, .docx</div></div>
+            <div class="format-card"><div class="format-icon txt">TXT</div><div class="format-name">TXT</div><div class="format-ext">.txt</div></div>
+            <div class="format-card"><div class="format-icon md">MD</div><div class="format-name">Markdown</div><div class="format-ext">.md</div></div>
+          </div>
+
+          <div class="benefit-section">
+            <h3>上傳後，你可以獲得</h3>
+            <div class="benefit-row">
+              <div class="benefit"><span class="benefit-icon">📋</span><div><div class="benefit-title">AI 整理重點</div><div class="benefit-desc">快速掌握核心概念</div></div></div>
+              <div class="benefit"><span class="benefit-icon">✏️</span><div><div class="benefit-title">生成測驗</div><div class="benefit-desc">自動生成練習題目</div></div></div>
+              <div class="benefit"><span class="benefit-icon">📊</span><div><div class="benefit-title">學習分析</div><div class="benefit-desc">分析學習成效</div></div></div>
+              <div class="benefit"><span class="benefit-icon">📁</span><div><div class="benefit-title">整合教材</div><div class="benefit-desc">建立個人知識庫</div></div></div>
+            </div>
+          </div>
+
+          <div *ngIf="uploadSuccess" class="success-msg">🎉 上傳成功！正在跳轉...</div>
+
+          <div class="upload-action">
+            <button class="btn-upload" (click)="upload()" [disabled]="!selectedFile || loading">
+              <mat-spinner *ngIf="loading" diameter="18" style="display:inline-block;margin-right:8px"></mat-spinner>
+              {{ loading ? '上傳中...' : '開始上傳' }}
+            </button>
+          </div>
+
+        </div>
+
+        <div class="upload-sidebar">
+          <div class="tip-card">
+            <h3>💡 上傳小提醒</h3>
+            <div class="tip-item"><span>✅</span><div><div class="tip-title">建議使用清晰的教材內容</div><div class="tip-desc">內容清晰的教材將有助於 AI 更準確地分析</div></div></div>
+            <div class="tip-item"><span>✅</span><div><div class="tip-title">單一檔案大小不超過 100MB</div><div class="tip-desc">若檔案過大，建議分段上傳</div></div></div>
+            <div class="tip-item"><span>✅</span><div><div class="tip-title">支援多種檔案格式</div><div class="tip-desc">PDF、Word、TXT 等常見格式</div></div></div>
+            <div class="tip-item"><span>✅</span><div><div class="tip-title">教材將自動進行處理</div><div class="tip-desc">上傳後系統將自動分析並整理重點</div></div></div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>

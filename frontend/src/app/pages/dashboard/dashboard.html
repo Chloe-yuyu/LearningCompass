@@ -1,0 +1,80 @@
+<div class="app-layout">
+  <app-navbar></app-navbar>
+  <div class="app-body">
+    <app-sidenav></app-sidenav>
+    <main class="app-main">
+
+      <div class="page-top">
+        <div class="page-top-row">
+          <div>
+            <h1>上傳教材 ☁️</h1>
+            <p>上傳你的教材，AI 將自動分析並生成學習資源</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="page-content">
+        <div style="display:flex; gap:28px; align-items:flex-start">
+
+          <!-- 上傳區 -->
+          <div style="flex:1">
+            <div class="lingo-card" style="padding:0; overflow:hidden; margin-bottom:20px">
+              <div class="drop-zone" (click)="fileInput.click()">
+                <div class="drop-icon">☁️</div>
+                <p class="drop-title" *ngIf="!selectedFile">拖曳檔案到這裡，或<span class="drop-link">點擊選擇檔案</span></p>
+                <p class="drop-title" *ngIf="selectedFile">✅ {{ selectedFile.name }}</p>
+                <p class="drop-sub">支援 PDF、Word、TXT、Markdown</p>
+                <button class="lingo-btn lingo-btn-primary" style="margin-top:16px">＋ 選擇檔案</button>
+                <p class="drop-limit">單一檔案上限 100MB</p>
+              </div>
+            </div>
+            <input #fileInput type="file" hidden accept=".pdf,.docx,.txt,.md" (change)="onFileSelected($event)">
+
+            <!-- 格式 -->
+            <div class="format-grid">
+              <div class="format-card" *ngFor="let f of formats">
+                <div class="format-icon" [style.background]="f.bg" [style.borderColor]="f.bd">{{ f.icon }}</div>
+                <div class="format-name">{{ f.name }}</div>
+                <div class="format-ext">{{ f.ext }}</div>
+              </div>
+            </div>
+
+            <!-- 效益 -->
+            <div class="lingo-card benefit-card">
+              <h3>上傳後，你可以獲得 ✨</h3>
+              <div class="benefit-row">
+                <div class="benefit" *ngFor="let b of benefits">
+                  <div class="benefit-icon">{{ b.icon }}</div>
+                  <div><div class="benefit-title">{{ b.title }}</div><div class="benefit-desc">{{ b.desc }}</div></div>
+                </div>
+              </div>
+            </div>
+
+            <div *ngIf="uploadSuccess" class="auth-success" style="margin-top:16px">🎉 上傳成功！正在跳轉...</div>
+
+            <div style="text-align:center; margin-top:20px">
+              <button class="lingo-btn lingo-btn-primary lingo-btn-lg" (click)="upload()" [disabled]="!selectedFile || loading">
+                <mat-spinner *ngIf="loading" diameter="20"></mat-spinner>
+                {{ loading ? '上傳中...' : '開始上傳 🚀' }}
+              </button>
+            </div>
+          </div>
+
+          <!-- 提醒 -->
+          <div style="width:260px; flex-shrink:0">
+            <div class="lingo-card tip-card">
+              <h3>💡 上傳小提醒</h3>
+              <div class="tip-item" *ngFor="let t of tips">
+                <span class="tip-check">✅</span>
+                <div><div class="tip-title">{{ t.title }}</div><div class="tip-desc">{{ t.desc }}</div></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <footer class="app-footer">© 2026 Learning Compass</footer>
+    </main>
+  </div>
+</div>

@@ -1,0 +1,87 @@
+<div class="app-layout">
+  <app-navbar></app-navbar>
+  <div class="app-body">
+    <app-sidenav></app-sidenav>
+    <main class="app-main">
+
+      <div class="page-top">
+        <h1>使用者設定 👤</h1>
+        <p>管理你的個人資訊與帳號設定</p>
+      </div>
+
+      <div class="page-content">
+        <div class="profile-body">
+
+          <!-- 大頭貼 -->
+          <div class="profile-avatar-card">
+            <div class="avatar-circle">{{ userName.charAt(0) }}</div>
+            <div class="avatar-name">{{ userName }}</div>
+            <div class="avatar-email">{{ userEmail }}</div>
+          </div>
+
+          <!-- 表單 -->
+          <div class="profile-form-card">
+            <div class="form-section-title">📋 個人資料</div>
+
+            <div class="form-field">
+              <label class="lingo-label">姓名</label>
+              <div class="lingo-input-wrap">
+                <input type="text" [(ngModel)]="userName" placeholder="請輸入姓名">
+              </div>
+            </div>
+
+            <div class="form-field">
+              <label class="lingo-label">電子郵件</label>
+              <div class="lingo-input-wrap" style="background:var(--bg)">
+                <input type="email" [(ngModel)]="userEmail" disabled>
+              </div>
+            </div>
+
+            <div class="form-field">
+              <label class="lingo-label">學校（選填）</label>
+              <div class="lingo-input-wrap">
+                <input type="text" [(ngModel)]="school" placeholder="請輸入學校名稱">
+              </div>
+            </div>
+
+            <div class="form-field">
+              <label class="lingo-label">科系（選填）</label>
+              <div class="lingo-input-wrap">
+                <input type="text" [(ngModel)]="department" placeholder="請輸入科系名稱">
+              </div>
+            </div>
+
+            <div class="form-field">
+              <label class="lingo-label">自我介紹（選填）</label>
+              <div class="lingo-input-wrap" style="align-items:flex-start; padding-top:12px">
+                <textarea [(ngModel)]="bio" placeholder="寫點關於你自己的事..." rows="3" style="padding:0; border:none; outline:none; width:100%; font-family:inherit; font-size:15px; font-weight:600; color:var(--text); resize:vertical; background:transparent"></textarea>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button class="lingo-btn lingo-btn-outline" (click)="cancel()">取消</button>
+              <button class="lingo-btn lingo-btn-primary" (click)="save()" [disabled]="saving">
+                {{ saving ? '儲存中...' : '💾 儲存變更' }}
+              </button>
+            </div>
+
+            <!-- 危險區域 -->
+            <div class="danger-zone">
+              <div class="form-section-title">⚠️ 其他</div>
+              <div class="danger-item">
+                <div class="danger-item-text">
+                  <div class="danger-title">🗑️ 刪除帳號</div>
+                  <div class="danger-desc">永久刪除你的帳號與所有資料，無法復原。</div>
+                </div>
+                <button class="lingo-btn lingo-btn-danger lingo-btn-sm" (click)="deleteAccount()">刪除帳號</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <footer class="app-footer">© 2026 Learning Compass</footer>
+    </main>
+  </div>
+</div>

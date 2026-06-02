@@ -1,0 +1,17 @@
+/* 登入後所有頁面共用 layout */
+.app-layout { display: flex; flex-direction: column; min-height: 100vh; }
+.app-body   { display: flex; flex: 1; }
+.app-main   { flex: 1; background: var(--bg); display: flex; flex-direction: column; min-width: 0; }
+
+.page-top {
+  padding: 28px 40px 20px;
+  background: #fff;
+  border-bottom: 3px solid var(--border);
+}
+.page-top h1 { font-size: 26px; font-weight: 900; color: var(--text); margin-bottom: 4px; letter-spacing: -0.3px; }
+.page-top p  { font-size: 14px; font-weight: 600; color: var(--text-lt); }
+.page-top-row { display: flex; justify-content: space-between; align-items: flex-end; }
+
+.page-content { padding: 32px 40px; flex: 1; }
+
+.app-footer { text-align: center; padding: 18px; font-size: 12px; font-weight: 700; color: var(--text-lt); background: #fff; border-top: 3px solid var(--border); }

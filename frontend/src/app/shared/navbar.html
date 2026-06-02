@@ -1,0 +1,14 @@
+<div class="top-bar">
+  <div class="top-logo" (click)="goHome()">
+    <span>🧭</span><span>Learning Compass</span>
+  </div>
+  <div class="top-user" *ngIf="isLoggedIn" routerLink="/profile">
+    <span class="notif-icon">🔔</span>
+    <div class="user-avatar">{{ userName.charAt(0) }}</div>
+    <span class="user-name">{{ userName }}</span>
+  </div>
+  <div class="top-actions" *ngIf="!isLoggedIn">
+    <button class="lingo-btn lingo-btn-outline lingo-btn-sm" routerLink="/login">登入</button>
+    <button class="lingo-btn lingo-btn-primary lingo-btn-sm" routerLink="/register">開始使用</button>
+  </div>
+</div>

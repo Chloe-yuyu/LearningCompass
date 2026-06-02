@@ -1,0 +1,84 @@
+<div class="app-layout">
+  <app-navbar></app-navbar>
+  <div class="app-body">
+    <app-sidenav></app-sidenav>
+    <main class="app-main">
+
+      <div class="page-top">
+        <div class="page-top-row">
+          <div>
+            <h1>我的教材 📚</h1>
+            <p>檢視與管理你上傳的所有教材</p>
+          </div>
+          <button class="lingo-btn lingo-btn-primary" routerLink="/upload">＋ 上傳新教材</button>
+        </div>
+      </div>
+
+      <div class="page-content">
+
+        <!-- 空狀態 -->
+        <div *ngIf="!isLoading && materials.length === 0" class="empty-state">
+          <div class="empty-icon">📭</div>
+          <p>尚未上傳任何教材</p>
+          <button class="lingo-btn lingo-btn-primary lingo-btn-lg" routerLink="/upload">立即上傳教材</button>
+        </div>
+
+        <!-- 列表 -->
+        <div class="material-list">
+          <div class="material-row" *ngFor="let m of materials">
+
+            <div class="row-icon">{{ getFileIcon(m.original_filename) }}</div>
+
+            <div class="row-info">
+              <div class="row-title">{{ m.original_filename }}</div>
+              <div class="row-meta">
+                <span>{{ m.created_at | slice:0:10 }}</span>
+                <span class="lingo-badge" [ngClass]="getStatusBadge(m.status)">{{ getStatusLabel(m.status) }}</span>
+              </div>
+              <div *ngIf="m.analysis" class="row-tags">
+                <span class="row-tag">📌 {{ m.analysis.title }}</span>
+                <span class="row-tag">📚 {{ m.analysis.subject }}</span>
+                <span class="row-tag">📊 {{ m.analysis.difficulty }}</span>
+              </div>
+              <div *ngIf="m.analysis?.summary" class="row-summary">{{ m.analysis.summary | slice:0:100 }}...</div>
+            </div>
+
+            <div class="row-actions">
+              <button class="lingo-btn lingo-btn-primary lingo-btn-sm"
+                      (click)="analyze(m.id)"
+                      [disabled]="analyzingId === m.id"
+                      *ngIf="m.status === 'uploaded'">
+                <mat-spinner *ngIf="analyzingId === m.id" diameter="14"></mat-spinner>
+                {{ analyzingId === m.id ? '分析中...' : '🤖 AI 分析' }}
+              </button>
+
+              <button class="lingo-btn lingo-btn-sm"
+                      style="background:var(--secondary);color:#fff;box-shadow:0 3px 0 var(--secondary-dk)"
+                      (click)="generateAll(m.id)"
+                      [disabled]="generatingId === m.id"
+                      *ngIf="m.status === 'analyzed' || m.status === 'done'">
+                <mat-spinner *ngIf="generatingId === m.id" diameter="14"></mat-spinner>
+                {{ generatingId === m.id ? '生成中...' : '✨ 生成資源' }}
+              </button>
+
+              <a class="lingo-btn lingo-btn-outline lingo-btn-sm"
+                 href="http://localhost:5000/ppt/download/{{ m.id }}"
+                 target="_blank"
+                 *ngIf="m.status === 'done'">
+                📥 下載投影片
+              </a>
+
+              <button class="lingo-btn lingo-btn-danger lingo-btn-sm"
+                      (click)="deleteMaterial(m.id, m.original_filename)">
+                🗑️
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+      <footer class="app-footer">© 2026 Learning Compass</footer>
+    </main>
+  </div>
+</div>
