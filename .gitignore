@@ -21,3 +21,6 @@ dist/
 # OS
 .DS_Store
 Thumbs.db
+
+# Firebase credentials
+backend/firebase_key.json
