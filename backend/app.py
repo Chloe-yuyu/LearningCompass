@@ -12,6 +12,7 @@ from src.main_agent import main_agent_bp
 from src.quiz_agent import quiz_agent_bp
 from src.summary_agent import summary_agent_bp
 from src.ppt_agent import ppt_agent_bp
+from src.chat_agent import chat_agent_bp
 
 app = Flask(__name__, static_folder=None)
 app.config.from_object(DevelopmentConfig())
@@ -50,6 +51,7 @@ app.register_blueprint(main_agent_bp, url_prefix='/agent')
 app.register_blueprint(quiz_agent_bp, url_prefix='/quiz')
 app.register_blueprint(summary_agent_bp, url_prefix='/summary')
 app.register_blueprint(ppt_agent_bp, url_prefix='/ppt')
+app.register_blueprint(chat_agent_bp, url_prefix='/chat')
 
 @app.route('/api/health')
 def health():

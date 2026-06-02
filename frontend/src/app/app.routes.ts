@@ -13,10 +13,34 @@ import { Materials } from './pages/materials/materials';
 const authGuard = () => {
   const router = inject(Router);
   const email = localStorage.getItem('user_email');
-  if (!email) {
+  const token = localStorage.getItem('token');
+
+  if (!email || !token) {
     router.navigate(['/login']);
     return false;
   }
+
+  // 修復：驗證 JWT token 是否過期（解析 payload 檢查 exp）
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const now = Math.floor(Date.now() / 1000);
+    if (payload.exp && payload.exp < now) {
+      // Token 已過期，清除登入狀態並導回登入頁
+      localStorage.removeItem('token');
+      localStorage.removeItem('user_email');
+      localStorage.removeItem('user_name');
+      router.navigate(['/login']);
+      return false;
+    }
+  } catch {
+    // Token 格式錯誤，視為無效
+    localStorage.removeItem('token');
+    localStorage.removeItem('user_email');
+    localStorage.removeItem('user_name');
+    router.navigate(['/login']);
+    return false;
+  }
+
   return true;
 };
 

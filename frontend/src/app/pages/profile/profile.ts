@@ -28,24 +28,43 @@ export class Profile implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.userName = localStorage.getItem('user_name') || '';
     this.userEmail = localStorage.getItem('user_email') || '';
+    this.userName = localStorage.getItem('user_name') || '';
     this.school = localStorage.getItem('user_school') || '';
     this.department = localStorage.getItem('user_department') || '';
     this.bio = localStorage.getItem('user_bio') || '';
   }
 
   save() {
-    this.saving = true;
-    localStorage.setItem('user_name', this.userName);
-    localStorage.setItem('user_school', this.school);
-    localStorage.setItem('user_department', this.department);
-    localStorage.setItem('user_bio', this.bio);
+    if (!this.userEmail) {
+      this.snackBar.open('找不到使用者，請重新登入', '關閉', { duration: 3000 });
+      return;
+    }
 
-    setTimeout(() => {
-      this.saving = false;
-      this.snackBar.open('✅ 資料已儲存', '關閉', { duration: 3000 });
-    }, 500);
+    this.saving = true;
+
+    // 修復：同步儲存到後端 MongoDB
+    this.http.post<any>('http://localhost:5000/register/update_profile', {
+      email: this.userEmail,
+      name: this.userName,
+      school: this.school,
+      department: this.department,
+      bio: this.bio
+    }).subscribe({
+      next: () => {
+        // 同步更新 localStorage
+        localStorage.setItem('user_name', this.userName);
+        localStorage.setItem('user_school', this.school);
+        localStorage.setItem('user_department', this.department);
+        localStorage.setItem('user_bio', this.bio);
+        this.saving = false;
+        this.snackBar.open('✅ 資料已儲存', '關閉', { duration: 3000 });
+      },
+      error: (err) => {
+        this.saving = false;
+        this.snackBar.open(err.error?.error || '儲存失敗，請稍後再試', '關閉', { duration: 3000 });
+      }
+    });
   }
 
   cancel() {

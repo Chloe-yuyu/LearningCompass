@@ -42,17 +42,9 @@ export class Dashboard implements OnInit, AfterViewChecked {
   activeChatId = '';
   currentFile: UploadedFile | null = null;
 
-  chatHistory: ChatRecord[] = [
-    { id: '1', title: '機器學習基礎概念整理', time: '今天 14:30' },
-    { id: '2', title: '資料結構練習題生成', time: '昨天 10:15' },
-    { id: '3', title: '作業系統重點摘要', time: '3天前' },
-  ];
+  chatHistory: ChatRecord[] = [];
 
-  uploadedFiles: UploadedFile[] = [
-    { id: '1', name: '機器學習.pdf', size: '2.4 MB', date: '今天', icon: '📕' },
-    { id: '2', name: '資料結構筆記.docx', size: '1.1 MB', date: '昨天', icon: '📘' },
-    { id: '3', name: '作業系統.pdf', size: '5.6 MB', date: '3天前', icon: '📕' },
-  ];
+  uploadedFiles: UploadedFile[] = [];
 
   suggestions = [
     '📋 幫我整理這份教材的重點',
@@ -79,19 +71,20 @@ export class Dashboard implements OnInit, AfterViewChecked {
   loadFiles() {
     const email = localStorage.getItem('user_email');
     if (!email) return;
-    this.http.get<any[]>(`http://localhost:5000/material/list?user_email=${email}`).subscribe({
-      next: (files) => {
-        if (files?.length) {
-          this.uploadedFiles = files.map(f => ({
-            id: f.id || f.file_id,
-            name: f.filename || f.name,
-            size: f.size ? `${(f.size / 1024 / 1024).toFixed(1)} MB` : '--',
-            date: f.uploaded_at ? new Date(f.uploaded_at).toLocaleDateString('zh-TW') : '--',
-            icon: f.filename?.endsWith('.pdf') ? '📕' : '📘'
-          }));
-        }
+
+    // 修復：後端回傳 { materials: [...] } 物件，不是陣列
+    this.http.get<any>(`http://localhost:5000/material/list?user_email=${encodeURIComponent(email)}`).subscribe({
+      next: (res) => {
+        const files = res.materials || [];
+        this.uploadedFiles = files.map((f: any) => ({
+          id: f.id || f._id,
+          name: f.original_filename || f.name || '未命名',
+          size: '--',
+          date: f.created_at ? new Date(f.created_at).toLocaleDateString('zh-TW') : '--',
+          icon: (f.original_filename || '').endsWith('.pdf') ? '📕' : '📘'
+        }));
       },
-      error: () => {} // 使用預設假資料
+      error: () => {}
     });
   }
 
@@ -104,7 +97,6 @@ export class Dashboard implements OnInit, AfterViewChecked {
 
   loadChat(id: string) {
     this.activeChatId = id;
-    // 實際串接 API 時從後端載入歷史訊息
   }
 
   selectFile(file: UploadedFile) {
@@ -138,7 +130,8 @@ export class Dashboard implements OnInit, AfterViewChecked {
     const body: any = { question: text, user_email: email };
     if (this.currentFile) body.file_id = this.currentFile.id;
 
-    this.http.post<any>('http://localhost:5000/chat', body).subscribe({
+    // 修復：正確的 chat API 路徑
+    this.http.post<any>('http://localhost:5000/chat/', body).subscribe({
       next: (res) => {
         const replyTime = new Date().toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' });
         this.messages.push({ role: 'assistant', content: res.answer || res.reply || '已收到您的問題，正在處理中...', time: replyTime });

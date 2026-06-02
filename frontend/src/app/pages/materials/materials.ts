@@ -6,6 +6,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Navbar } from '../../shared/navbar';
 import { Sidenav } from '../../shared/sidenav';
+import { lastValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-materials',
@@ -37,13 +38,11 @@ export class Materials implements OnInit {
 
   loadMaterials() {
     const email = localStorage.getItem('user_email') || '';
-    console.log('載入教材 email:', email);
     this.isLoading = true;
 
     this.http.get<any>(`http://localhost:5000/material/list?user_email=${encodeURIComponent(email)}`)
       .subscribe({
         next: (res) => {
-          console.log('教材數量:', res.materials?.length);
           this.materials = res.materials || [];
           this.isLoading = false;
           this.cdr.detectChanges();
@@ -72,18 +71,22 @@ export class Materials implements OnInit {
       });
   }
 
-  generateAll(materialId: string) {
+  // 修復：改用 lastValueFrom 取代已棄用的 .toPromise()
+  async generateAll(materialId: string) {
     this.generatingId = materialId;
-    Promise.allSettled([
-      this.http.post(`http://localhost:5000/summary/generate/${materialId}`, {}).toPromise(),
-      this.http.post(`http://localhost:5000/quiz/generate/${materialId}`, {}).toPromise(),
-      this.http.post(`http://localhost:5000/ppt/generate/${materialId}`, {}).toPromise()
-    ]).then((results) => {
-      this.generatingId = '';
-      const failed = results.filter(r => r.status === 'rejected').length;
-      this.snackBar.open(failed === 0 ? '🎉 全部生成完成！' : `完成（${3 - failed}/3 成功）`, '關閉', { duration: 4000 });
-      this.loadMaterials();
-    });
+    const results = await Promise.allSettled([
+      lastValueFrom(this.http.post(`http://localhost:5000/summary/generate/${materialId}`, {})),
+      lastValueFrom(this.http.post(`http://localhost:5000/quiz/generate/${materialId}`, {})),
+      lastValueFrom(this.http.post(`http://localhost:5000/ppt/generate/${materialId}`, {}))
+    ]);
+    this.generatingId = '';
+    const failed = results.filter(r => r.status === 'rejected').length;
+    this.snackBar.open(
+      failed === 0 ? '🎉 全部生成完成！' : `完成（${3 - failed}/3 成功）`,
+      '關閉',
+      { duration: 4000 }
+    );
+    this.loadMaterials();
   }
 
   deleteMaterial(materialId: string, filename: string) {

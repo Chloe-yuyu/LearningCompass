@@ -1,8 +1,7 @@
 from flask import request, jsonify, Blueprint
 from werkzeug.security import generate_password_hash
-from accessories import redis_client, get_mongo_db
+from accessories import get_mongo_db
 import uuid
-import json
 from datetime import datetime
 
 register_bp = Blueprint('register', __name__)
@@ -47,6 +46,9 @@ def update_profile():
 
     data = request.get_json()
     email = data.get('email')
+
+    if not email:
+        return jsonify({"error": "未提供 Email"}), 400
 
     try:
         db = get_mongo_db()
