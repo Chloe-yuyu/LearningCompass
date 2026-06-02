@@ -1,17 +1,24 @@
 /* Scroll 容器 */
 .home-page {
+  --nav-height: 90px;
   color: var(--text);
   height: 100vh;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+  scroll-padding-top: var(--nav-height);
+  overflow-wrap: anywhere;
 }
 
 /* 每個區塊滿版 */
 .snap-section {
-  height: 100vh;
-  overflow: hidden;
+  min-height: 100vh;
+  height: auto;
+  overflow: visible;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  scroll-margin-top: var(--nav-height);
 }
 
 /* Navbar */
@@ -64,7 +71,7 @@
 .stat-label { font-size: 11px; font-weight: 800; color: var(--text-lt); margin-top: 5px; text-transform: uppercase; letter-spacing: 0.4px; }
 
 /* Section */
-.section { padding: 72px; min-height: 100vh; display: flex; flex-direction: column; justify-content: center; }
+.section { padding: calc(72px + var(--nav-height)) 72px 72px; min-height: 100vh; display: flex; flex-direction: column; justify-content: center; }
 .section-header { text-align: center; margin-bottom: 64px; }
 .section-label { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 800; padding: 5px 14px; border-radius: 100px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 16px; }
 .section h2 { font-size: 56px; font-weight: 900; margin-bottom: 16px; letter-spacing: -1px; line-height: 1.15; }
@@ -329,7 +336,7 @@
 
 /* About */
 .about-section { background: var(--bg); }
-.about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; max-width: 980px; margin: 0 auto; }
+.about-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 28px; width: min(100%, 980px); margin: 0 auto; }
 .about-card { background: #fff; border-radius: var(--radius-lg); padding: 30px; border: 3px solid var(--border); box-shadow: 0 5px 0 var(--border); }
 .about-card h3 { font-size: 17px; font-weight: 900; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
 .about-card p { font-size: 14px; font-weight: 600; color: var(--text-md); line-height: 1.8; }
@@ -340,7 +347,7 @@
 .member-role { font-size: 11px; font-weight: 700; color: var(--text-lt); text-transform: uppercase; letter-spacing: 0.3px; }
 
 /* LINE Bot */
-.linebot-card { background: #fff; border-radius: var(--radius-lg); padding: 30px; border: 3px solid #06C755; box-shadow: 0 5px 0 #05a847; text-align: center; }
+.linebot-card { background: #fff; border-radius: var(--radius-lg); padding: 30px; border: 3px solid #06C755; box-shadow: 0 5px 0 #05a847; text-align: center; min-width: 0; }
 .linebot-header { display: flex; align-items: center; gap: 10px; justify-content: center; margin-bottom: 10px; }
 .linebot-header h3 { font-size: 19px; font-weight: 900; margin: 0; }
 .linebot-card > p { font-size: 14px; font-weight: 600; color: var(--text-md); margin-bottom: 20px; line-height: 1.6; }
@@ -364,14 +371,14 @@
 
 /* RWD */
 @media (max-width: 900px) {
+  .home-page { --nav-height: 76px; }
   .navbar { padding: 14px 24px; }
   .nav-links { display: none; }
-  .hero { flex-direction: column; padding: 40px 24px; gap: 32px; }
+  .hero { flex-direction: column; padding: calc(40px + var(--nav-height)) 24px 40px; gap: 32px; }
   .hero-content h1 { font-size: 36px; }
   .hero-image { width: 100%; }
   .dashboard-preview { max-width: 100%; }
-  .section { padding: 48px 24px; }
-  .section { min-height: unset; padding: 60px 24px; }
+  .section { min-height: unset; padding: calc(48px + var(--nav-height)) 24px 60px; }
   .section h2 { font-size: 38px; }
   .features-grid { grid-template-columns: repeat(2,1fr); }
   .flow-steps { flex-wrap: wrap; justify-content: center; }
