@@ -1,80 +1,148 @@
-<div class="app-layout">
-  <app-navbar></app-navbar>
-  <div class="app-body">
-    <app-sidenav></app-sidenav>
-    <main class="app-main">
+<div class="chat-layout">
 
-      <div class="page-top">
-        <div class="page-top-row">
-          <div>
-            <h1>上傳教材 ☁️</h1>
-            <p>上傳你的教材，AI 將自動分析並生成學習資源</p>
+  <!-- ── 左側邊欄 ── -->
+  <aside class="chat-sidebar">
+
+    <!-- Logo -->
+    <div class="sidebar-logo">
+      <span>🧭</span>
+      <span>Learning Compass</span>
+    </div>
+
+    <!-- 新對話按鈕 -->
+    <button class="new-chat-btn lingo-btn lingo-btn-primary" (click)="newChat()">
+      ＋ 新對話
+    </button>
+
+    <!-- 聊天紀錄 -->
+    <div class="sidebar-section">
+      <div class="sidebar-label">最近對話</div>
+      <div class="chat-history">
+        <div class="history-item" *ngFor="let c of chatHistory"
+             [class.active]="c.id === activeChatId"
+             (click)="loadChat(c.id)">
+          <span class="history-icon">💬</span>
+          <div class="history-info">
+            <div class="history-title">{{ c.title }}</div>
+            <div class="history-time">{{ c.time }}</div>
           </div>
+        </div>
+        <div class="history-empty" *ngIf="chatHistory.length === 0">
+          還沒有對話紀錄
+        </div>
+      </div>
+    </div>
+
+    <!-- 分隔線 -->
+    <div class="sidebar-divider"></div>
+
+    <!-- 上傳檔案目錄 -->
+    <div class="sidebar-section sidebar-files">
+      <div class="sidebar-label">
+        📁 我的教材
+        <a routerLink="/upload" class="sidebar-upload-btn">＋ 上傳</a>
+      </div>
+      <div class="file-list">
+        <div class="file-item" *ngFor="let f of uploadedFiles" (click)="selectFile(f)">
+          <span class="file-icon">{{ f.icon }}</span>
+          <div class="file-info">
+            <div class="file-name">{{ f.name }}</div>
+            <div class="file-meta">{{ f.size }} · {{ f.date }}</div>
+          </div>
+        </div>
+        <div class="history-empty" *ngIf="uploadedFiles.length === 0">
+          尚未上傳任何教材
+        </div>
+      </div>
+    </div>
+
+    <!-- 底部使用者 -->
+    <div class="sidebar-user" routerLink="/profile">
+      <div class="sidebar-avatar">{{ userName.charAt(0) }}</div>
+      <div class="sidebar-user-info">
+        <div class="sidebar-user-name">{{ userName }}</div>
+        <div class="sidebar-user-role">學習者</div>
+      </div>
+      <span class="sidebar-settings">⚙️</span>
+    </div>
+
+  </aside>
+
+  <!-- ── 主聊天區 ── -->
+  <main class="chat-main">
+
+    <!-- 頂部標題列 -->
+    <div class="chat-topbar">
+      <div class="chat-topbar-title">
+        <span *ngIf="!currentFile">🧭 Learning Compass AI</span>
+        <span *ngIf="currentFile">📄 {{ currentFile.name }}</span>
+      </div>
+      <div class="chat-topbar-actions">
+        <button class="lingo-btn lingo-btn-outline lingo-btn-sm" *ngIf="currentFile" (click)="currentFile = null">
+          ✕ 取消選擇
+        </button>
+      </div>
+    </div>
+
+    <!-- 訊息區 -->
+    <div class="chat-messages" #messagesContainer>
+
+      <!-- 歡迎畫面（無訊息時） -->
+      <div class="chat-welcome" *ngIf="messages.length === 0">
+        <div class="welcome-emoji">🧭</div>
+        <h2>你好，{{ userName }}！</h2>
+        <p>上傳教材後，我可以幫你生成摘要、練習題、投影片，或直接回答問題。</p>
+        <div class="welcome-suggestions">
+          <button class="suggest-btn" *ngFor="let s of suggestions" (click)="sendSuggestion(s)">
+            {{ s }}
+          </button>
         </div>
       </div>
 
-      <div class="page-content">
-        <div style="display:flex; gap:28px; align-items:flex-start">
+      <!-- 對話訊息 -->
+      <div class="message-wrapper" *ngFor="let msg of messages" [class.user-wrapper]="msg.role === 'user'">
+        <div class="message-avatar" *ngIf="msg.role === 'assistant'">🧭</div>
+        <div class="message-bubble" [class.user-bubble]="msg.role === 'user'" [class.ai-bubble]="msg.role === 'assistant'">
+          <p>{{ msg.content }}</p>
+          <span class="message-time">{{ msg.time }}</span>
+        </div>
+        <div class="message-avatar user-av" *ngIf="msg.role === 'user'">{{ userName.charAt(0) }}</div>
+      </div>
 
-          <!-- 上傳區 -->
-          <div style="flex:1">
-            <div class="lingo-card" style="padding:0; overflow:hidden; margin-bottom:20px">
-              <div class="drop-zone" (click)="fileInput.click()">
-                <div class="drop-icon">☁️</div>
-                <p class="drop-title" *ngIf="!selectedFile">拖曳檔案到這裡，或<span class="drop-link">點擊選擇檔案</span></p>
-                <p class="drop-title" *ngIf="selectedFile">✅ {{ selectedFile.name }}</p>
-                <p class="drop-sub">支援 PDF、Word、TXT、Markdown</p>
-                <button class="lingo-btn lingo-btn-primary" style="margin-top:16px">＋ 選擇檔案</button>
-                <p class="drop-limit">單一檔案上限 100MB</p>
-              </div>
-            </div>
-            <input #fileInput type="file" hidden accept=".pdf,.docx,.txt,.md" (change)="onFileSelected($event)">
-
-            <!-- 格式 -->
-            <div class="format-grid">
-              <div class="format-card" *ngFor="let f of formats">
-                <div class="format-icon" [style.background]="f.bg" [style.borderColor]="f.bd">{{ f.icon }}</div>
-                <div class="format-name">{{ f.name }}</div>
-                <div class="format-ext">{{ f.ext }}</div>
-              </div>
-            </div>
-
-            <!-- 效益 -->
-            <div class="lingo-card benefit-card">
-              <h3>上傳後，你可以獲得 ✨</h3>
-              <div class="benefit-row">
-                <div class="benefit" *ngFor="let b of benefits">
-                  <div class="benefit-icon">{{ b.icon }}</div>
-                  <div><div class="benefit-title">{{ b.title }}</div><div class="benefit-desc">{{ b.desc }}</div></div>
-                </div>
-              </div>
-            </div>
-
-            <div *ngIf="uploadSuccess" class="auth-success" style="margin-top:16px">🎉 上傳成功！正在跳轉...</div>
-
-            <div style="text-align:center; margin-top:20px">
-              <button class="lingo-btn lingo-btn-primary lingo-btn-lg" (click)="upload()" [disabled]="!selectedFile || loading">
-                <mat-spinner *ngIf="loading" diameter="20"></mat-spinner>
-                {{ loading ? '上傳中...' : '開始上傳 🚀' }}
-              </button>
-            </div>
-          </div>
-
-          <!-- 提醒 -->
-          <div style="width:260px; flex-shrink:0">
-            <div class="lingo-card tip-card">
-              <h3>💡 上傳小提醒</h3>
-              <div class="tip-item" *ngFor="let t of tips">
-                <span class="tip-check">✅</span>
-                <div><div class="tip-title">{{ t.title }}</div><div class="tip-desc">{{ t.desc }}</div></div>
-              </div>
-            </div>
-          </div>
-
+      <!-- 載入中 -->
+      <div class="message-wrapper" *ngIf="isLoading">
+        <div class="message-avatar">🧭</div>
+        <div class="message-bubble ai-bubble loading-bubble">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
         </div>
       </div>
 
-      <footer class="app-footer">© 2026 Learning Compass</footer>
-    </main>
-  </div>
+    </div>
+
+    <!-- 輸入區 -->
+    <div class="chat-input-area">
+      <div class="selected-file-chip" *ngIf="currentFile">
+        📄 {{ currentFile.name }}
+        <span (click)="currentFile = null">✕</span>
+      </div>
+      <div class="chat-input-box">
+        <textarea
+          class="chat-textarea"
+          [(ngModel)]="inputText"
+          (keydown)="onEnter($event)"
+          placeholder="輸入問題，或選擇左側教材開始分析…"
+          rows="1"
+          #chatInput>
+        </textarea>
+        <button class="send-btn lingo-btn lingo-btn-primary"
+                (click)="sendMessage()"
+                [disabled]="!inputText.trim() || isLoading">
+          ↑
+        </button>
+      </div>
+      <div class="input-hint">按 Enter 送出 · Shift+Enter 換行</div>
+    </div>
+
+  </main>
+
 </div>
