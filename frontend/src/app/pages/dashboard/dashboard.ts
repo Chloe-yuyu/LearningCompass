@@ -43,8 +43,12 @@ export class Dashboard implements OnInit, AfterViewChecked {
   currentFile: UploadedFile | null = null;
 
   chatHistory: ChatRecord[] = [];
-
   uploadedFiles: UploadedFile[] = [];
+
+  // 上傳教材（內嵌畫面）
+  showUploadView = false;
+  pendingUploadFile: File | null = null;
+  uploadLoading = false;
 
   suggestions = [
     '📋 幫我整理這份教材的重點',
@@ -72,7 +76,6 @@ export class Dashboard implements OnInit, AfterViewChecked {
     const email = localStorage.getItem('user_email');
     if (!email) return;
 
-    // 修復：後端回傳 { materials: [...] } 物件，不是陣列
     this.http.get<any>(`http://localhost:5000/material/list?user_email=${encodeURIComponent(email)}`).subscribe({
       next: (res) => {
         const files = res.materials || [];
@@ -93,17 +96,65 @@ export class Dashboard implements OnInit, AfterViewChecked {
     this.activeChatId = '';
     this.currentFile = null;
     this.inputText = '';
+    this.showUploadView = false;
   }
 
   loadChat(id: string) {
     this.activeChatId = id;
+    this.showUploadView = false;
   }
 
   selectFile(file: UploadedFile) {
     this.currentFile = file;
+    this.showUploadView = false;
     this.snackBar.open(`已選擇「${file.name}」，可開始提問`, '關閉', { duration: 2000 });
   }
 
+  // ── 內嵌上傳畫面 ──
+  openUploadView() {
+    this.showUploadView = true;
+    this.pendingUploadFile = null;
+  }
+
+  closeUploadView() {
+    this.showUploadView = false;
+    this.pendingUploadFile = null;
+  }
+
+  onUploadFileSelected(event: any) {
+    this.pendingUploadFile = event.target.files[0] || null;
+  }
+
+  onDropFile(event: DragEvent) {
+    event.preventDefault();
+    const file = event.dataTransfer?.files[0];
+    if (file) this.pendingUploadFile = file;
+  }
+
+  uploadFile() {
+    if (!this.pendingUploadFile) return;
+    this.uploadLoading = true;
+
+    const formData = new FormData();
+    formData.append('file', this.pendingUploadFile);
+    formData.append('user_email', localStorage.getItem('user_email') || '');
+
+    this.http.post<any>('http://localhost:5000/material/upload', formData).subscribe({
+      next: () => {
+        this.uploadLoading = false;
+        this.snackBar.open('✅ 上傳成功！', '關閉', { duration: 3000 });
+        this.pendingUploadFile = null;
+        this.showUploadView = false;
+        this.loadFiles(); // 重新載入教材列表
+      },
+      error: (err) => {
+        this.uploadLoading = false;
+        this.snackBar.open(err.error?.error || '上傳失敗，請稍後再試', '關閉', { duration: 3000 });
+      }
+    });
+  }
+
+  // ── 聊天 ──
   sendSuggestion(text: string) {
     this.inputText = text;
     this.sendMessage();
@@ -130,7 +181,6 @@ export class Dashboard implements OnInit, AfterViewChecked {
     const body: any = { question: text, user_email: email };
     if (this.currentFile) body.file_id = this.currentFile.id;
 
-    // 修復：正確的 chat API 路徑
     this.http.post<any>('http://localhost:5000/chat/', body).subscribe({
       next: (res) => {
         const replyTime = new Date().toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' });
