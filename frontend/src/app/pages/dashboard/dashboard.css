@@ -651,3 +651,106 @@
   padding: 12px !important;
   font-size: 14px !important;
 }
+
+/* ══════════════════════════════
+   個人資料頁面
+══════════════════════════════ */
+.profile-view {
+  flex: 1;
+  overflow-y: auto;
+  padding: 40px 8%;
+  background: var(--bg);
+}
+
+.profile-panel {
+  max-width: 560px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+/* 頭像區 */
+.profile-avatar-area {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: #fff;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px 28px;
+  box-shadow: 0 3px 0 var(--border);
+}
+
+.profile-avatar-big {
+  width: 64px; height: 64px; border-radius: 50%;
+  background: var(--primary); color: #fff;
+  font-size: 26px; font-weight: 900;
+  display: flex; align-items: center; justify-content: center;
+  border: 3px solid var(--primary-dk);
+  flex-shrink: 0;
+}
+
+.profile-avatar-info { flex: 1; }
+.profile-email {
+  font-size: 14px; font-weight: 700;
+  color: var(--text-md);
+}
+
+/* 表單 */
+.profile-form {
+  background: #fff;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px 28px;
+  box-shadow: 0 3px 0 var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.profile-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.profile-field label {
+  font-size: 12px; font-weight: 900;
+  color: var(--text-lt);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.profile-input {
+  font-family: var(--font);
+  font-size: 15px; font-weight: 600;
+  color: var(--text);
+  background: var(--bg);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.profile-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(88,204,2,0.15);
+}
+.profile-textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* 操作按鈕 */
+.profile-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+/* 選中教材高亮 */
+.active-file {
+  background: var(--primary-bg) !important;
+  border-color: var(--primary-bd) !important;
+}
