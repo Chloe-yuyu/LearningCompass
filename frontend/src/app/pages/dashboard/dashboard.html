@@ -1,4 +1,4 @@
-<div class="chat-layout">
+<div class="chat-layout" (click)="closeMenus($event)">
 
   <!-- ── 左側邊欄 ── -->
   <aside class="chat-sidebar">
@@ -54,16 +54,32 @@
           尚未上傳任何教材
         </div>
       </div>
+
+      <!-- 查看全部教材按鈕 -->
+      <button class="view-all-btn" (click)="openMaterialsView()">
+        📚 查看全部教材
+      </button>
     </div>
 
     <!-- 底部使用者 -->
-    <div class="sidebar-user" routerLink="/profile">
+    <div class="sidebar-user" (click)="toggleUserMenu($event)">
       <div class="sidebar-avatar">{{ userName.charAt(0) }}</div>
       <div class="sidebar-user-info">
         <div class="sidebar-user-name">{{ userName }}</div>
         <div class="sidebar-user-role">學習者</div>
       </div>
       <span class="sidebar-settings">⚙️</span>
+
+      <!-- 使用者選單 -->
+      <div class="user-menu" *ngIf="showUserMenu" (click)="$event.stopPropagation()">
+        <div class="user-menu-item" (click)="goProfile()">
+          <span>👤</span> 個人資料
+        </div>
+        <div class="user-menu-divider"></div>
+        <div class="user-menu-item danger" (click)="logout()">
+          <span>🚪</span> 登出
+        </div>
+      </div>
     </div>
 
   </aside>
@@ -74,15 +90,20 @@
     <!-- 頂部標題列 -->
     <div class="chat-topbar">
       <div class="chat-topbar-title">
-        <span *ngIf="!showUploadView && !currentFile">🧭 Learning Compass AI</span>
-        <span *ngIf="!showUploadView && currentFile">📄 {{ currentFile.name }}</span>
+        <span *ngIf="!showUploadView && !showMaterialsView && !currentFile">🧭 Learning Compass AI</span>
+        <span *ngIf="!showUploadView && !showMaterialsView && currentFile">📄 {{ currentFile.name }}</span>
         <span *ngIf="showUploadView">📤 上傳教材</span>
+        <span *ngIf="showMaterialsView">📚 我的教材（{{ uploadedFiles.length }} 份）</span>
       </div>
       <div class="chat-topbar-actions">
-        <button class="lingo-btn lingo-btn-outline lingo-btn-sm" *ngIf="showUploadView" (click)="closeUploadView()">
+        <button class="lingo-btn lingo-btn-outline lingo-btn-sm"
+                *ngIf="showUploadView || showMaterialsView"
+                (click)="backToChat()">
           ← 返回對話
         </button>
-        <button class="lingo-btn lingo-btn-outline lingo-btn-sm" *ngIf="!showUploadView && currentFile" (click)="currentFile = null">
+        <button class="lingo-btn lingo-btn-outline lingo-btn-sm"
+                *ngIf="!showUploadView && !showMaterialsView && currentFile"
+                (click)="currentFile = null">
           ✕ 取消選擇
         </button>
       </div>
@@ -94,25 +115,17 @@
         <div class="upload-icon">📤</div>
         <h2>上傳新教材</h2>
         <p>支援 PDF、Word（.docx）、PowerPoint（.pptx）</p>
-
-        <!-- 拖曳區 -->
         <div class="upload-dropzone"
              [class.has-file]="pendingUploadFile"
              (click)="uploadFileInput.click()"
              (dragover)="$event.preventDefault()"
              (drop)="onDropFile($event)">
-          <span *ngIf="!pendingUploadFile">
-            📁 點擊或拖曳檔案至此
-          </span>
-          <span *ngIf="pendingUploadFile" class="upload-filename">
-            ✅ {{ pendingUploadFile.name }}
-          </span>
+          <span *ngIf="!pendingUploadFile">📁 點擊或拖曳檔案至此</span>
+          <span *ngIf="pendingUploadFile" class="upload-filename">✅ {{ pendingUploadFile.name }}</span>
         </div>
-
         <input type="file" #uploadFileInput hidden
                accept=".pdf,.doc,.docx,.ppt,.pptx"
                (change)="onUploadFileSelected($event)">
-
         <button class="lingo-btn lingo-btn-primary upload-submit-btn"
                 (click)="uploadFile()"
                 [disabled]="!pendingUploadFile || uploadLoading">
@@ -122,20 +135,58 @@
       </div>
     </div>
 
+    <!-- ══ 我的教材畫面 ══ -->
+    <div class="materials-view" *ngIf="showMaterialsView">
+      <div class="materials-panel">
+
+        <!-- 無教材時 -->
+        <div class="materials-empty" *ngIf="uploadedFiles.length === 0">
+          <div style="font-size:48px;margin-bottom:16px">📭</div>
+          <h3>還沒有上傳任何教材</h3>
+          <button class="lingo-btn lingo-btn-primary" (click)="openUploadView()" style="margin-top:20px">
+            ＋ 立即上傳
+          </button>
+        </div>
+
+        <!-- 教材列表 -->
+        <div class="materials-grid" *ngIf="uploadedFiles.length > 0">
+          <div class="material-card" *ngFor="let f of uploadedFiles">
+            <div class="material-card-icon">{{ f.icon }}</div>
+            <div class="material-card-info">
+              <div class="material-card-name">{{ f.name }}</div>
+              <div class="material-card-meta">{{ f.date }}</div>
+            </div>
+            <div class="material-card-actions">
+              <button class="mat-action-btn select-btn" (click)="selectFileAndBack(f)" title="選擇此教材">
+                💬 使用
+              </button>
+              <button class="mat-action-btn delete-btn" (click)="deleteFile(f)" title="刪除">
+                🗑
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 上傳更多 -->
+        <button class="lingo-btn lingo-btn-outline upload-more-btn"
+                *ngIf="uploadedFiles.length > 0"
+                (click)="openUploadView()">
+          ＋ 上傳更多教材
+        </button>
+
+      </div>
+    </div>
+
     <!-- ══ 聊天區（正常模式） ══ -->
-    <ng-container *ngIf="!showUploadView">
+    <ng-container *ngIf="!showUploadView && !showMaterialsView">
 
       <!-- 訊息區 -->
       <div class="chat-messages" #messagesContainer>
-
-        <!-- 歡迎畫面（無訊息時） -->
         <div class="chat-welcome" *ngIf="messages.length === 0">
           <div class="welcome-emoji">🧭</div>
           <h2>你好，{{ userName }}！</h2>
           <p>上傳教材後，我可以幫你生成摘要、練習題、投影片，或直接回答問題。</p>
         </div>
-
-        <!-- 對話訊息 -->
         <div class="message-wrapper" *ngFor="let msg of messages" [class.user-wrapper]="msg.role === 'user'">
           <div class="message-avatar" *ngIf="msg.role === 'assistant'">🧭</div>
           <div class="message-bubble" [class.user-bubble]="msg.role === 'user'" [class.ai-bubble]="msg.role === 'assistant'">
@@ -144,39 +195,27 @@
           </div>
           <div class="message-avatar user-av" *ngIf="msg.role === 'user'">{{ userName.charAt(0) }}</div>
         </div>
-
-        <!-- 載入中 -->
         <div class="message-wrapper" *ngIf="isLoading">
           <div class="message-avatar">🧭</div>
           <div class="message-bubble ai-bubble loading-bubble">
             <span class="dot"></span><span class="dot"></span><span class="dot"></span>
           </div>
         </div>
-
       </div>
 
       <!-- 輸入區 -->
       <div class="chat-input-area">
-
-        <!-- 已選教材提示 -->
         <div class="selected-file-chip" *ngIf="currentFile">
           📄 {{ currentFile.name }}
           <span (click)="currentFile = null">✕</span>
         </div>
-
-        <!-- 建議按鈕列（單排，輸入框上方） -->
         <div class="suggestions-row" *ngIf="messages.length === 0">
           <button class="suggest-btn" *ngFor="let s of suggestions" (click)="sendSuggestion(s)">
             {{ s }}
           </button>
         </div>
-
-        <!-- 輸入框 -->
         <div class="chat-input-box">
-          <!-- + 按鈕（上傳教材） -->
-          <button class="attach-btn" (click)="openUploadView()" title="上傳教材">
-            ＋
-          </button>
+          <button class="attach-btn" (click)="openUploadView()" title="上傳教材">＋</button>
           <textarea
             class="chat-textarea"
             [(ngModel)]="inputText"
