@@ -36,19 +36,26 @@
     <!-- 分隔線 -->
     <div class="sidebar-divider"></div>
 
-    <!-- 上傳檔案目錄 -->
+    <!-- 上傳檔案目錄（可多選） -->
     <div class="sidebar-section sidebar-files">
       <div class="sidebar-label">
         📁 我的教材
         <button class="sidebar-upload-btn" (click)="setView('upload')">＋ 上傳</button>
       </div>
       <div class="file-list">
-        <div class="file-item" *ngFor="let f of uploadedFiles" (click)="selectFile(f)"
-             [class.active-file]="currentFile?.id === f.id">
+        <div class="file-item" *ngFor="let f of uploadedFiles"
+             (click)="toggleFile(f)"
+             [class.active-file]="isFileSelected(f.id)">
+          <span class="file-check">
+            <span *ngIf="isFileSelected(f.id)">✓</span>
+          </span>
           <span class="file-icon">{{ f.icon }}</span>
           <div class="file-info">
             <div class="file-name">{{ f.name }}</div>
-            <div class="file-meta">{{ f.size }} · {{ f.date }}</div>
+            <div class="file-meta">
+              <span *ngIf="f.vectorized" class="indexed-badge">✓ 已建立索引</span>
+              <span *ngIf="!f.vectorized">{{ f.date }}</span>
+            </div>
           </div>
         </div>
         <div class="history-empty" *ngIf="uploadedFiles.length === 0">
@@ -56,7 +63,6 @@
         </div>
       </div>
 
-      <!-- 查看全部教材按鈕 -->
       <button class="view-all-btn" (click)="setView('materials')">
         📚 查看全部教材
       </button>
@@ -71,7 +77,6 @@
       </div>
       <span class="sidebar-settings">⚙️</span>
 
-      <!-- 使用者彈出選單 -->
       <div class="user-menu" *ngIf="showUserMenu" (click)="$event.stopPropagation()">
         <div class="user-menu-item" (click)="setView('profile')">
           <span>👤</span> 個人資料
@@ -91,8 +96,7 @@
     <!-- 頂部標題列 -->
     <div class="chat-topbar">
       <div class="chat-topbar-title">
-        <span *ngIf="activeView === 'chat' && !currentFile">🧭 Learning Compass AI</span>
-        <span *ngIf="activeView === 'chat' && currentFile">📄 {{ currentFile.name }}</span>
+        <span *ngIf="activeView === 'chat'">🧭 Learning Compass AI</span>
         <span *ngIf="activeView === 'upload'">📤 上傳教材</span>
         <span *ngIf="activeView === 'materials'">📚 我的教材（{{ uploadedFiles.length }} 份）</span>
         <span *ngIf="activeView === 'profile'">👤 個人資料</span>
@@ -102,11 +106,6 @@
                 *ngIf="activeView !== 'chat'"
                 (click)="backToChat()">
           ← 返回對話
-        </button>
-        <button class="lingo-btn lingo-btn-outline lingo-btn-sm"
-                *ngIf="activeView === 'chat' && currentFile"
-                (click)="currentFile = null">
-          ✕ 取消選擇
         </button>
       </div>
     </div>
@@ -152,10 +151,12 @@
             <div class="material-card-icon">{{ f.icon }}</div>
             <div class="material-card-info">
               <div class="material-card-name">{{ f.name }}</div>
-              <div class="material-card-meta">{{ f.date }}</div>
+              <div class="material-card-meta">
+                {{ f.date }}
+                <span *ngIf="f.vectorized" class="indexed-badge-small">✓ 已建立索引</span>
+              </div>
             </div>
             <div class="material-card-actions">
-              <button class="mat-action-btn select-btn" (click)="selectFileAndBack(f)">💬 使用</button>
               <button class="mat-action-btn delete-btn" (click)="deleteFile(f)">🗑 刪除</button>
             </div>
           </div>
@@ -171,8 +172,6 @@
     <!-- ══ 個人資料 ══ -->
     <div class="profile-view" *ngIf="activeView === 'profile'">
       <div class="profile-panel">
-
-        <!-- 頭像區 -->
         <div class="profile-avatar-area">
           <div class="profile-avatar-big">{{ userName.charAt(0) }}</div>
           <div class="profile-avatar-info">
@@ -180,7 +179,6 @@
           </div>
         </div>
 
-        <!-- 表單 -->
         <div class="profile-form">
           <div class="profile-field">
             <label>姓名</label>
@@ -200,7 +198,6 @@
           </div>
         </div>
 
-        <!-- 操作按鈕 -->
         <div class="profile-actions">
           <button class="lingo-btn lingo-btn-outline" (click)="cancelProfile()">取消</button>
           <button class="lingo-btn lingo-btn-primary" (click)="saveProfile()" [disabled]="profileSaving">
@@ -208,7 +205,6 @@
             <span *ngIf="profileSaving">儲存中...</span>
           </button>
         </div>
-
       </div>
     </div>
 
@@ -218,52 +214,59 @@
         <div class="chat-welcome" *ngIf="messages.length === 0">
           <div class="welcome-emoji">🧭</div>
           <h2>你好，{{ userName }}！</h2>
-          <p>上傳教材後，我可以幫你生成摘要、練習題、投影片，或直接回答問題。</p>
+          <p>選擇左側教材後，挑一個功能就能開始：問答、筆記、出題、投影片。</p>
         </div>
         <div class="message-wrapper" *ngFor="let msg of messages" [class.user-wrapper]="msg.role === 'user'">
           <div class="message-avatar" *ngIf="msg.role === 'assistant'">🧭</div>
           <div class="message-bubble" [class.user-bubble]="msg.role === 'user'" [class.ai-bubble]="msg.role === 'assistant'">
-            <p>{{ msg.content }}</p>
+            <p *ngIf="msg.role === 'user'" style="white-space: pre-wrap">{{ msg.content }}</p>
+            <div *ngIf="msg.role === 'assistant'" class="markdown-content" [innerHTML]="renderMarkdown(msg.content)"></div>
+            <div class="message-sources" *ngIf="msg.sources && msg.sources.length > 0">
+              <span class="source-label">📎 參考教材：</span>
+              <span class="source-tag" *ngFor="let s of msg.sources">{{ s.material_name }}</span>
+            </div>
             <span class="message-time">{{ msg.time }}</span>
           </div>
           <div class="message-avatar user-av" *ngIf="msg.role === 'user'">{{ userName.charAt(0) }}</div>
-        </div>
-        <div class="message-wrapper" *ngIf="isLoading">
-          <div class="message-avatar">🧭</div>
-          <div class="message-bubble ai-bubble loading-bubble">
-            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-          </div>
         </div>
       </div>
 
       <!-- 輸入區 -->
       <div class="chat-input-area">
-        <div class="selected-file-chip" *ngIf="currentFile">
-          📄 {{ currentFile.name }}
-          <span (click)="currentFile = null">✕</span>
+
+        <!-- 已選教材 chips -->
+        <div class="selected-files-row" *ngIf="hasSelectedFiles">
+          <span class="selected-files-label">📚 已選</span>
+          <div class="selected-file-chip" *ngFor="let f of selectedFiles">
+            {{ f.icon }} {{ f.name }}
+            <span class="chip-remove" (click)="removeSelectedFile(f.id)">✕</span>
+          </div>
         </div>
-        <div class="suggestions-row" *ngIf="messages.length === 0">
-          <button class="suggest-btn" *ngFor="let s of suggestions" (click)="sendSuggestion(s)">
-            {{ s }}
-          </button>
-        </div>
+
+        <!-- 輸入框 -->
         <div class="chat-input-box">
           <button class="attach-btn" (click)="setView('upload')" title="上傳教材">＋</button>
           <textarea
             class="chat-textarea"
             [(ngModel)]="inputText"
             (keydown)="onEnter($event)"
-            placeholder="輸入問題，或選擇左側教材開始分析…"
+            [placeholder]="hasSelectedFiles ? '輸入你想做什麼，例如：幫我整理重點、出5題練習題...' : '請先從左側選擇教材...'"
+            [disabled]="!hasSelectedFiles"
             rows="1"
             #chatInput>
           </textarea>
           <button class="send-btn lingo-btn lingo-btn-primary"
                   (click)="sendMessage()"
-                  [disabled]="!inputText.trim() || isLoading">
+                  [disabled]="!hasSelectedFiles || isLoading">
             ↑
           </button>
         </div>
-        <div class="input-hint">按 Enter 送出 · Shift+Enter 換行</div>
+        <div class="input-hint" *ngIf="hasSelectedFiles">
+          直接輸入你的需求，AI 會自動判斷要做什麼 · 按 Enter 送出 · Shift+Enter 換行
+        </div>
+        <div class="input-hint" *ngIf="!hasSelectedFiles">
+          ⬅ 請先從左側教材清單勾選一份或多份教材
+        </div>
       </div>
     </ng-container>
 

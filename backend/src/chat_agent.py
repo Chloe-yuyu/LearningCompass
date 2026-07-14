@@ -1,10 +1,27 @@
+"""
+chat_agent.py
+
+一般對話功能（非教材問答），換成 Claude API。
+路由：POST /chat/
+"""
+
 from flask import request, jsonify, Blueprint
-from accessories import get_mongo_db, get_gridfs, init_gemini
+from accessories import get_mongo_db, get_gridfs
 from bson.objectid import ObjectId
+import anthropic
 import tempfile
 import os
 
 chat_agent_bp = Blueprint('chat_agent', __name__)
+
+_claude_client = None
+
+def get_claude_client():
+    global _claude_client
+    if _claude_client is None:
+        _claude_client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
+    return _claude_client
+
 
 def extract_text_from_file(file_path: str) -> str:
     ext = file_path.rsplit('.', 1)[-1].lower()
@@ -30,6 +47,7 @@ def extract_text_from_file(file_path: str) -> str:
             return ""
     return ""
 
+
 @chat_agent_bp.route('/', methods=['POST', 'OPTIONS'])
 def chat():
     if request.method == 'OPTIONS':
@@ -37,19 +55,13 @@ def chat():
 
     data = request.json or {}
     question = data.get('question', '').strip()
-    user_email = data.get('user_email', '')
-    file_id = data.get('file_id', '')
+    file_id  = data.get('file_id', '')
 
     if not question:
         return jsonify({"error": "請輸入問題"}), 400
 
-    model = init_gemini()
-    if not model:
-        return jsonify({"error": "AI 服務未初始化"}), 500
-
     context = ""
 
-    # 如果有指定教材，從 MongoDB 取出內容作為 context
     if file_id:
         try:
             db = get_mongo_db()
@@ -57,18 +69,17 @@ def chat():
             if material:
                 analysis = material.get('analysis')
                 if analysis:
-                    # 優先用已分析的結果
                     key_concepts = analysis.get('key_concepts', [])
-                    concepts_text = "\n".join([f"- {c['name']}: {c['description']}" for c in key_concepts])
-                    context = f"""
-教材標題：{analysis.get('title', '')}
-學科：{analysis.get('subject', '')}
-摘要：{analysis.get('summary', '')}
-核心概念：
-{concepts_text}
-"""
+                    concepts_text = "\n".join(
+                        [f"- {c['name']}: {c['description']}" for c in key_concepts]
+                    )
+                    context = (
+                        f"教材標題：{analysis.get('title', '')}\n"
+                        f"學科：{analysis.get('subject', '')}\n"
+                        f"摘要：{analysis.get('summary', '')}\n"
+                        f"核心概念：\n{concepts_text}"
+                    )
                 else:
-                    # 從 GridFS 讀原始檔案
                     grid_id = material.get('grid_id')
                     save_filename = material.get('save_filename', 'file.txt')
                     if grid_id:
@@ -84,22 +95,21 @@ def chat():
             print(f"讀取教材失敗: {e}")
 
     if context:
-        prompt = f"""你是一個教育 AI 助理，請根據以下教材內容回答學生的問題。
-
-教材內容：
-{context}
-
-學生問題：{question}
-
-請用繁體中文回答，回答要清楚易懂，如果問題與教材無關也可以正常回答。"""
+        system = "你是 Learning Compass 的教育 AI 助理，請根據提供的教材內容回答學生的問題，用繁體中文作答，回答清楚易懂。"
+        user_content = f"教材內容：\n{context}\n\n學生問題：{question}"
     else:
-        prompt = f"""你是一個教育 AI 助理，請用繁體中文回答以下問題：
-
-{question}"""
+        system = "你是 Learning Compass 的教育 AI 助理，請用繁體中文回答以下問題，回答清楚易懂。"
+        user_content = question
 
     try:
-        response = model.generate_content(prompt)
-        answer = response.text.strip()
+        client = get_claude_client()
+        response = client.messages.create(
+            model="claude-sonnet-4-6",
+            max_tokens=2048,
+            system=system,
+            messages=[{"role": "user", "content": user_content}]
+        )
+        answer = response.content[0].text.strip()
         return jsonify({"answer": answer}), 200
     except Exception as e:
         return jsonify({"error": f"AI 回應失敗: {str(e)}"}), 500

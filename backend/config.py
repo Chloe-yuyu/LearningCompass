@@ -29,6 +29,9 @@ class Config:
     # Gemini API Key
     GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', 'AIzaSyAqih7634FR4qTiOScnNbXfweAqEPYaIIE')
 
+    # Anthropic Claude API Key
+    ANTHROPIC_API_KEY = os.getenv('ANTHROPIC_API_KEY', '')
+
 class DevelopmentConfig(Config):
     SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:123456@localhost:3306/learning_compass'
     API_BASE_URL = 'http://localhost:5000'

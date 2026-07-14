@@ -68,10 +68,32 @@
                 📥 下載投影片
               </a>
 
+              <button class="lingo-btn lingo-btn-outline lingo-btn-sm"
+                      (click)="toggleAsk(m.id)"
+                      *ngIf="m.status === 'analyzed' || m.status === 'done'">
+                💬 問教材
+              </button>
+
               <button class="lingo-btn lingo-btn-danger lingo-btn-sm"
                       (click)="deleteMaterial(m.id, m.original_filename)">
                 🗑️
               </button>
+            </div>
+
+            <!-- 問教材區塊（Claude Agent SDK） -->
+            <div class="ask-box" *ngIf="askingId === m.id">
+              <input type="text"
+                     class="ask-input"
+                     placeholder="輸入你對這份教材的問題..."
+                     [(ngModel)]="askQuestion"
+                     (keyup.enter)="submitAsk(m.id)">
+              <button class="lingo-btn lingo-btn-primary lingo-btn-sm"
+                      (click)="submitAsk(m.id)"
+                      [disabled]="isAsking">
+                <mat-spinner *ngIf="isAsking" diameter="14"></mat-spinner>
+                {{ isAsking ? '思考中...' : '送出' }}
+              </button>
+              <div class="ask-answer" *ngIf="askAnswers[m.id]">{{ askAnswers[m.id] }}</div>
             </div>
 
           </div>

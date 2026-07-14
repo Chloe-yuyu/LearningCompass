@@ -41,25 +41,3 @@ def get_gridfs():
     if _gridfs is None:
         init_mongodb()
     return _gridfs
-
-def init_gemini():
-    try:
-        try:
-            from config import Config
-            api_key = Config.GEMINI_API_KEY
-        except:
-            api_key = os.getenv('GEMINI_API_KEY', '')
-
-        if not api_key:
-            print("⚠️ 未設定 GEMINI_API_KEY")
-            return None
-
-        import google.generativeai as genai
-        genai.configure(api_key=api_key)
-        model = genai.GenerativeModel('gemini-1.5-flash')
-        print("✅ Gemini API 初始化成功")
-        return model
-
-    except Exception as e:
-        print(f"❌ Gemini API 初始化失敗: {e}")
-        return None

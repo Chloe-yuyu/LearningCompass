@@ -2,6 +2,7 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Navbar } from '../../shared/navbar';
@@ -10,7 +11,7 @@ import { lastValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-materials',
-  imports: [CommonModule, RouterLink, MatSnackBarModule, MatProgressSpinnerModule, Navbar, Sidenav],
+  imports: [CommonModule, FormsModule, RouterLink, MatSnackBarModule, MatProgressSpinnerModule, Navbar, Sidenav],
   templateUrl: './materials.html',
   styleUrl: './materials.css'
 })
@@ -19,6 +20,12 @@ export class Materials implements OnInit {
   analyzingId = '';
   generatingId = '';
   isLoading = true;
+
+  // 問教材（Claude Agent SDK）相關狀態
+  askingId = '';
+  askQuestion = '';
+  askAnswers: { [materialId: string]: string } = {};
+  isAsking = false;
 
   constructor(
     private http: HttpClient,
@@ -99,6 +106,33 @@ export class Materials implements OnInit {
         },
         error: () => { this.snackBar.open('刪除失敗', '關閉', { duration: 3000 }); }
       });
+  }
+
+  toggleAsk(materialId: string) {
+    this.askingId = this.askingId === materialId ? '' : materialId;
+    this.askQuestion = '';
+  }
+
+  submitAsk(materialId: string) {
+    if (!this.askQuestion.trim()) {
+      this.snackBar.open('請先輸入問題', '關閉', { duration: 2000 });
+      return;
+    }
+    this.isAsking = true;
+    this.http.post<any>(`http://localhost:5000/sdk-agent/ask`, {
+      material_id: materialId,
+      question: this.askQuestion
+    }).subscribe({
+      next: (res) => {
+        this.isAsking = false;
+        this.askAnswers[materialId] = res.answer || '沒有回傳結果';
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.isAsking = false;
+        this.snackBar.open(err.error?.error || '問答失敗', '關閉', { duration: 3000 });
+      }
+    });
   }
 
   getFileIcon(filename: string): string {
