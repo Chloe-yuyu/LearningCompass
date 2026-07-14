@@ -182,52 +182,77 @@
   <section class="snap-section section about-section" id="about">
     <div class="section-header">
       <div class="section-label lingo-badge lingo-badge-green">👋 關於我們</div>
-      <h2>世新大學資管系</h2>
-      <p class="section-sub">第33屆畢業專題</p>
+      <h2>開發團隊</h2>
+      <p class="section-sub">世新大學資管系 · 第33屆畢業專題 · 指導老師：胡碩誠 老師</p>
     </div>
-    <div class="about-grid">
-      <div class="about-card">
-        <h3>🎓 專題介紹</h3>
-        <p>Learning Compass 是一個以 AI 多代理人系統為核心的智慧學習平台。我們相信，每個人都能透過正確的工具，讓學習變得更有效率、更有趣。</p>
-        <h3 style="margin-top:20px">👥 開發團隊</h3>
-        <div class="team-grid">
-          <div class="member"><div class="member-avatar">👩‍💻</div><div class="member-name">陳詩薇</div><div class="member-role">前後端開發</div></div>
-          <div class="member"><div class="member-avatar">👩‍💻</div><div class="member-name">賴語宸</div><div class="member-role">前後端開發</div></div>
-          <div class="member"><div class="member-avatar">👩‍🎨</div><div class="member-name">羅宥喬</div><div class="member-role">UI 設計</div></div>
-          <div class="member"><div class="member-avatar">👩‍🔬</div><div class="member-name">陳昀宣</div><div class="member-role">需求分析</div></div>
+
+    <!-- 拼圖卡片 2×2 -->
+    <div class="puzzle-grid">
+
+      <!-- 左上：陳詩薇（綠） -->
+      <div class="puzzle-card pz-green pz-tab-r pz-tab-b">
+        <div class="pz-avatar-ring pz-ring-green">
+          <img src="assets/team/dino-green.png" alt="陳詩薇" class="pz-avatar-img" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="pz-avatar-fallback" style="display:none">🦕</div>
         </div>
-        <p style="margin-top:16px;font-size:14px;font-weight:600;color:var(--text-md)">🏫 指導老師：胡碩誠 老師</p>
+        <div class="pz-name">陳詩薇</div>
+        <div class="pz-role" style="color:#2e7d32">UI / Frontend Designer</div>
+        <div class="pz-tags">
+          <span class="pz-tag" style="background:#c8e6c9;color:#2e7d32">Figma</span>
+          <span class="pz-tag" style="background:#c8e6c9;color:#2e7d32">Angular</span>
+          <span class="pz-tag" style="background:#c8e6c9;color:#2e7d32">UI Design</span>
+        </div>
+        <div class="pz-icon">🎨</div>
       </div>
-      <div class="linebot-card">
-        <div class="linebot-header">
-          <svg viewBox="0 0 40 40" fill="none" width="32" height="32">
-            <rect x="4" y="4" width="32" height="32" rx="8" fill="#06C755"/>
-            <path d="M20 10c-6.08 0-11 4.03-11 9 0 3.07 2.04 5.77 5.13 7.37-.23.85-.85 3.08-.97 3.55-.15.58.21.57.45.41.19-.12 3.02-2.06 4.24-2.9.37.05.74.07 1.15.07 6.08 0 11-4.03 11-9s-4.92-9-11-9z" fill="white"/>
-            <path d="M16 22v-5M16 19h4M20 22v-5M22 17h2.5M22 19.5h2.5M22 22h2.5" stroke="#06C755" stroke-width="1.5" stroke-linecap="round"/>
-          </svg>
-          <h3>LINE Bot 學習助理</h3>
+
+      <!-- 右上：賴語宸（紫） -->
+      <div class="puzzle-card pz-purple pz-hole-l pz-tab-b">
+        <div class="pz-avatar-ring pz-ring-purple">
+          <img src="assets/team/dino-purple.png" alt="賴語宸" class="pz-avatar-img" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="pz-avatar-fallback" style="display:none">🧙</div>
         </div>
-        <p>加入 Learning Compass LINE Bot，隨時接收學習提醒、查詢學習進度！</p>
-        <div class="qr-box">
-          <svg viewBox="0 0 60 60" fill="none" width="48" height="48">
-            <rect x="4" y="4" width="22" height="22" rx="3" stroke="#06C755" stroke-width="2"/>
-            <rect x="9" y="9" width="12" height="12" rx="1" fill="#06C755" opacity="0.5"/>
-            <rect x="34" y="4" width="22" height="22" rx="3" stroke="#06C755" stroke-width="2"/>
-            <rect x="39" y="9" width="12" height="12" rx="1" fill="#06C755" opacity="0.5"/>
-            <rect x="4" y="34" width="22" height="22" rx="3" stroke="#06C755" stroke-width="2"/>
-            <rect x="9" y="39" width="12" height="12" rx="1" fill="#06C755" opacity="0.5"/>
-            <rect x="34" y="34" width="6" height="6" rx="1" fill="#06C755" opacity="0.4"/>
-            <rect x="42" y="34" width="6" height="6" rx="1" fill="#06C755" opacity="0.4"/>
-            <rect x="50" y="34" width="6" height="6" rx="1" fill="#06C755" opacity="0.4"/>
-            <rect x="34" y="42" width="6" height="6" rx="1" fill="#06C755" opacity="0.4"/>
-            <rect x="50" y="50" width="6" height="6" rx="1" fill="#06C755" opacity="0.4"/>
-          </svg>
-          <div class="qr-label">LINE Bot QR Code</div>
-          <div class="qr-sub">即將上線</div>
+        <div class="pz-name">賴語宸</div>
+        <div class="pz-role" style="color:#6a1b9a">Backend Developer &amp; Agent Developer</div>
+        <div class="pz-tags">
+          <span class="pz-tag" style="background:#e1bee7;color:#6a1b9a">Flask</span>
+          <span class="pz-tag" style="background:#e1bee7;color:#6a1b9a">Python</span>
+          <span class="pz-tag" style="background:#e1bee7;color:#6a1b9a">Agent Dev</span>
         </div>
-        <a class="line-btn" href="#" target="_blank">💬 加入 LINE Bot</a>
-        <p class="line-note">* 點擊按鈕或掃描 QR Code 加入好友</p>
+        <div class="pz-icon">&lt;/&gt;</div>
       </div>
+
+      <!-- 左下：羅宥喬（藍） -->
+      <div class="puzzle-card pz-blue pz-hole-t pz-tab-r">
+        <div class="pz-avatar-ring pz-ring-blue">
+          <img src="assets/team/dino-blue.png" alt="羅宥喬" class="pz-avatar-img" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="pz-avatar-fallback" style="display:none">🦖</div>
+        </div>
+        <div class="pz-name">羅宥喬</div>
+        <div class="pz-role" style="color:#1565c0">RAG Developer</div>
+        <div class="pz-tags">
+          <span class="pz-tag" style="background:#bbdefb;color:#1565c0">RAG</span>
+          <span class="pz-tag" style="background:#bbdefb;color:#1565c0">Vector DB</span>
+          <span class="pz-tag" style="background:#bbdefb;color:#1565c0">Embedding</span>
+        </div>
+        <div class="pz-icon">🔍</div>
+      </div>
+
+      <!-- 右下：陳昀宣（橘） -->
+      <div class="puzzle-card pz-orange pz-hole-l pz-hole-t">
+        <div class="pz-avatar-ring pz-ring-orange">
+          <img src="assets/team/dino-orange.png" alt="陳昀宣" class="pz-avatar-img" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="pz-avatar-fallback" style="display:none">🐉</div>
+        </div>
+        <div class="pz-name">陳昀宣</div>
+        <div class="pz-role" style="color:#e65100">Web Layout &amp; Information Research</div>
+        <div class="pz-tags">
+          <span class="pz-tag" style="background:#ffe0b2;color:#e65100">HTML/CSS</span>
+          <span class="pz-tag" style="background:#ffe0b2;color:#e65100">Web Layout</span>
+          <span class="pz-tag" style="background:#ffe0b2;color:#e65100">Research</span>
+        </div>
+        <div class="pz-icon">📄</div>
+      </div>
+
     </div>
   </section>
 
