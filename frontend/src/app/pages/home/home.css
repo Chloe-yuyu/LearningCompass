@@ -337,6 +337,22 @@
 /* About */
 .about-section { background: #f9f9fb; }
 
+/* About sub cards */
+.about-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 28px; width: min(100%, 980px); margin: 0 auto; }
+.about-card { background: #fff; border-radius: var(--radius-lg); padding: 30px; border: 3px solid var(--border); box-shadow: 0 5px 0 var(--border); }
+.about-card h3 { font-size: 17px; font-weight: 900; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+.about-card p { font-size: 14px; font-weight: 600; color: var(--text-md); line-height: 1.8; }
+.linebot-card { background: #fff; border-radius: var(--radius-lg); padding: 30px; border: 3px solid #06C755; box-shadow: 0 5px 0 #05a847; text-align: center; min-width: 0; }
+.linebot-header { display: flex; align-items: center; gap: 10px; justify-content: center; margin-bottom: 10px; }
+.linebot-header h3 { font-size: 19px; font-weight: 900; margin: 0; }
+.linebot-card > p { font-size: 14px; font-weight: 600; color: var(--text-md); margin-bottom: 20px; line-height: 1.6; }
+.qr-box { width: 130px; height: 130px; border: 3px dashed #06C755; border-radius: var(--radius); margin: 0 auto 18px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #f0fff4; }
+.qr-label { font-size: 11px; font-weight: 800; color: #06C755; margin-top: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+.qr-sub { font-size: 10px; color: var(--text-lt); font-weight: 600; }
+.line-btn { display: block; padding: 12px 28px; background: #06C755; color: #fff; border-radius: var(--radius); font-size: 15px; font-weight: 900; text-decoration: none; box-shadow: 0 4px 0 #05a847; transition: all 0.15s; margin-bottom: 10px; }
+.line-btn:hover { transform: translateY(2px); box-shadow: 0 2px 0 #05a847; }
+.line-note { font-size: 12px; font-weight: 600; color: var(--text-lt); }
+
 /* ── 拼圖卡片 ── */
 .puzzle-grid {
   display: grid;
@@ -496,6 +512,7 @@
   .features-grid { grid-template-columns: repeat(2,1fr); }
   .flow-steps { flex-wrap: wrap; justify-content: center; }
   .step-arrow { display: none; }
+  .about-grid { grid-template-columns: 1fr; }
   .puzzle-grid { grid-template-columns: 1fr; max-width: 340px; }
   .pz-tab-r::after, .pz-hole-l::after { display: none; }
   .pz-hole-t::before { background: #f9f9fb; }
