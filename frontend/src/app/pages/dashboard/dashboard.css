@@ -251,6 +251,11 @@
   font-size: 16px; font-weight: 900;
   color: var(--text);
 }
+.chat-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 
 /* 訊息區 */
 .chat-messages {
