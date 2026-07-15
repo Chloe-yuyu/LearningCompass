@@ -90,10 +90,17 @@ export class Dashboard implements OnInit, AfterViewChecked {
   // 頁面狀態
   activeView: 'chat' | 'upload' | 'materials' | 'profile' | 'quiz' = 'chat';
 
-  // 測驗紀錄
+  // 測驗紀錄（歷史）
   quizRecords: QuizRecord[] = [];
   selectedQuiz: QuizRecord | null = null;
   quizDetailMode: 'list' | 'analysis' | 'questions' = 'list';
+
+  // 互動測驗（作答中）
+  activeQuizQuestions: QuizQuestion[] = [];
+  quizUserAnswers: string[] = [];
+  quizSubmitted = false;
+  quizScore = 0;
+  quizMaterialTitle = '';
 
   // 上傳
   pendingUploadFile: File | null = null;
@@ -254,6 +261,94 @@ export class Dashboard implements OnInit, AfterViewChecked {
   backToQuizList() {
     this.selectedQuiz = null;
     this.quizDetailMode = 'list';
+  }
+
+  // ── 互動測驗 ──
+  parseQuizFromMessage(content: string): QuizQuestion[] {
+    const questions: QuizQuestion[] = [];
+    // Match blocks like: 第 1 題：...  A. ... B. ... C. ... D. ... 答案：X 解析：...
+    const blocks = content.split(/(?=第\s*\d+\s*題[：:])/);
+    for (const block of blocks) {
+      const qMatch = block.match(/第\s*(\d+)\s*題[：:]\s*([\s\S]*?)(?=\n?[A-Da-d][.．])/);
+      if (!qMatch) continue;
+      const index = parseInt(qMatch[1]);
+      const question = qMatch[2].trim();
+      const optMatches = [...block.matchAll(/([A-Da-d])[.．]\s*([^\nA-Da-d答解]+)/g)];
+      const options = optMatches.map(m => `${m[1].toUpperCase()}. ${m[2].trim()}`);
+      const answerMatch = block.match(/答案[：:]\s*([A-Da-d])/i);
+      const explMatch = block.match(/解析[：:]\s*([\s\S]+?)(?=第\s*\d+\s*題|$)/);
+      if (!answerMatch || options.length < 2) continue;
+      questions.push({
+        index,
+        question,
+        options,
+        answer: answerMatch[1].toUpperCase(),
+        userAnswer: '',
+        correct: false,
+        explanation: explMatch ? explMatch[1].trim() : ''
+      });
+    }
+    return questions;
+  }
+
+  startActiveQuiz(questions: QuizQuestion[]) {
+    this.activeQuizQuestions = questions.map(q => ({ ...q, userAnswer: '', correct: false }));
+    this.quizUserAnswers = new Array(questions.length).fill('');
+    this.quizSubmitted = false;
+    this.quizScore = 0;
+    this.quizMaterialTitle = this.selectedFiles.map(f => f.name).join(', ') || '教材';
+  }
+
+  selectAnswer(qIndex: number, option: string) {
+    if (this.quizSubmitted) return;
+    const letter = option.charAt(0).toUpperCase();
+    this.quizUserAnswers[qIndex] = letter;
+    this.activeQuizQuestions[qIndex].userAnswer = letter;
+  }
+
+  submitQuiz() {
+    let correct = 0;
+    for (let i = 0; i < this.activeQuizQuestions.length; i++) {
+      const q = this.activeQuizQuestions[i];
+      q.userAnswer = this.quizUserAnswers[i] || '';
+      q.correct = q.userAnswer === q.answer;
+      if (q.correct) correct++;
+    }
+    this.quizScore = Math.round((correct / this.activeQuizQuestions.length) * 100);
+    this.quizSubmitted = true;
+
+    // Save to quiz records
+    const now = new Date();
+    const record: QuizRecord = {
+      id: Date.now().toString(),
+      title: this.quizMaterialTitle,
+      date: now.toLocaleDateString('zh-TW', { month: 'numeric', day: 'numeric' }),
+      duration: '--',
+      totalScore: 100,
+      score: this.quizScore,
+      status: '已完成',
+      questions: this.activeQuizQuestions
+    };
+    this.quizRecords.unshift(record);
+
+    // POST to backend
+    this.http.post('http://localhost:5000/quiz/save', {
+      user_email: this.userEmail,
+      title: this.quizMaterialTitle,
+      score: this.quizScore,
+      total_score: 100,
+      questions: this.activeQuizQuestions
+    }).subscribe({ error: () => {} });
+  }
+
+  closeActiveQuiz() {
+    this.activeQuizQuestions = [];
+    this.quizSubmitted = false;
+    this.quizScore = 0;
+  }
+
+  get correctCount(): number {
+    return this.activeQuizQuestions.filter(q => q.correct).length;
   }
 
   backToChat() {
@@ -492,15 +587,24 @@ export class Dashboard implements OnInit, AfterViewChecked {
       next: (res) => {
         this.messages.pop();
         const t = new Date().toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' });
+        const answer = res.answer || '已收到您的問題';
         this.messages.push({
           role: 'assistant',
-          content: res.answer || '已收到您的問題',
+          content: answer,
           time: t,
           sources: res.sources
         });
         this.isLoading = false;
         this.activeChatId = res.chat_id || '';
         this.loadChatHistory();
+
+        // Auto-detect quiz output
+        if (this.selectedFunction === 'quiz') {
+          const parsed = this.parseQuizFromMessage(answer);
+          if (parsed.length > 0) {
+            this.startActiveQuiz(parsed);
+          }
+        }
       },
       error: (err) => {
         this.messages.pop();

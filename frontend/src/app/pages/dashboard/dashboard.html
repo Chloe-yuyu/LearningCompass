@@ -357,6 +357,56 @@
         </div>
       </div>
 
+      <!-- ── 互動測驗面板 ── -->
+      <div class="active-quiz-panel" *ngIf="activeQuizQuestions.length > 0">
+        <div class="aq-header">
+          <span class="aq-title">✏️ 測驗進行中</span>
+          <span class="aq-material">{{ quizMaterialTitle }}</span>
+          <button class="aq-close-btn" (click)="closeActiveQuiz()">✕</button>
+        </div>
+
+        <!-- Score banner after submit -->
+        <div class="aq-score-banner" *ngIf="quizSubmitted">
+          <span class="aq-score-num">{{ quizScore }}</span>
+          <span class="aq-score-label">分</span>
+          <span class="aq-score-detail">（{{ correctCount }} / {{ activeQuizQuestions.length }} 題正確）</span>
+        </div>
+
+        <div class="aq-questions">
+          <div class="aq-question-block" *ngFor="let q of activeQuizQuestions; let i = index"
+               [class.aq-correct]="quizSubmitted && q.correct"
+               [class.aq-wrong]="quizSubmitted && !q.correct">
+            <div class="aq-q-title">第 {{ q.index }} 題：{{ q.question }}</div>
+            <div class="aq-options">
+              <button class="aq-option-btn"
+                      *ngFor="let opt of q.options"
+                      [class.aq-selected]="quizUserAnswers[i] === opt.charAt(0)"
+                      [class.aq-correct-opt]="quizSubmitted && opt.charAt(0) === q.answer"
+                      [class.aq-wrong-opt]="quizSubmitted && quizUserAnswers[i] === opt.charAt(0) && opt.charAt(0) !== q.answer"
+                      (click)="selectAnswer(i, opt)">
+                {{ opt }}
+              </button>
+            </div>
+            <div class="aq-explanation" *ngIf="quizSubmitted && q.explanation">
+              💡 {{ q.explanation }}
+            </div>
+          </div>
+        </div>
+
+        <div class="aq-footer">
+          <button class="aq-submit-btn lingo-btn lingo-btn-primary"
+                  *ngIf="!quizSubmitted"
+                  (click)="submitQuiz()">
+            交卷
+          </button>
+          <button class="aq-submit-btn lingo-btn lingo-btn-secondary"
+                  *ngIf="quizSubmitted"
+                  (click)="closeActiveQuiz()">
+            關閉
+          </button>
+        </div>
+      </div>
+
       <!-- 輸入區 -->
       <div class="chat-input-area">
 
