@@ -100,12 +100,33 @@
         <span *ngIf="activeView === 'upload'">📤 上傳教材</span>
         <span *ngIf="activeView === 'materials'">📚 我的教材（{{ uploadedFiles.length }} 份）</span>
         <span *ngIf="activeView === 'profile'">👤 個人資料</span>
+        <span *ngIf="activeView === 'quiz'">
+          <span *ngIf="quizDetailMode === 'list'">✏️ 測驗紀錄</span>
+          <span *ngIf="quizDetailMode === 'analysis'">📊 答題分析 — {{ selectedQuiz?.title }}</span>
+          <span *ngIf="quizDetailMode === 'questions'">📋 查看題目 — {{ selectedQuiz?.title }}</span>
+        </span>
       </div>
       <div class="chat-topbar-actions">
+        <!-- 測驗紀錄 tab（聊天時顯示） -->
+        <button class="topbar-tab-btn" *ngIf="activeView === 'chat'" (click)="setView('quiz')">
+          ✏️ 測驗紀錄
+        </button>
+        <!-- 測驗詳情返回列表 -->
         <button class="lingo-btn lingo-btn-outline lingo-btn-sm"
-                *ngIf="activeView !== 'chat'"
+                *ngIf="activeView === 'quiz' && quizDetailMode !== 'list'"
+                (click)="backToQuizList()">
+          ← 返回列表
+        </button>
+        <!-- 其他視圖返回聊天 -->
+        <button class="lingo-btn lingo-btn-outline lingo-btn-sm"
+                *ngIf="activeView !== 'chat' && activeView !== 'quiz'"
                 (click)="backToChat()">
           ← 返回對話
+        </button>
+        <button class="lingo-btn lingo-btn-outline lingo-btn-sm"
+                *ngIf="activeView === 'quiz' && quizDetailMode === 'list'"
+                (click)="backToChat()">
+          💬 返回聊天
         </button>
       </div>
     </div>
@@ -206,6 +227,111 @@
           </button>
         </div>
       </div>
+    </div>
+
+    <!-- ══ 測驗紀錄 ══ -->
+    <div class="quiz-view" *ngIf="activeView === 'quiz'">
+
+      <!-- 列表模式 -->
+      <div class="quiz-list-panel" *ngIf="quizDetailMode === 'list'">
+        <div class="quiz-empty" *ngIf="quizRecords.length === 0">
+          <div style="font-size:48px;margin-bottom:16px">📝</div>
+          <h3>還沒有測驗紀錄</h3>
+          <p>在聊天中請 AI 出題後，完成測驗即可在這裡查看紀錄</p>
+          <button class="lingo-btn lingo-btn-primary" (click)="backToChat()" style="margin-top:20px">
+            💬 去聊天出題
+          </button>
+        </div>
+        <div class="quiz-record-list" *ngIf="quizRecords.length > 0">
+          <div class="quiz-record-card" *ngFor="let q of quizRecords">
+            <div class="quiz-record-info">
+              <div class="quiz-record-title">{{ q.title }}</div>
+              <div class="quiz-record-meta">
+                測驗日期：{{ q.date }} ／
+                時間：{{ q.duration }} ／
+                總分：{{ q.totalScore }} ／
+                得分：{{ q.score }} ／
+                狀態：<span [class.quiz-done]="q.status === '已完成'" [class.quiz-pending]="q.status === '未完成'">{{ q.status }}</span>
+              </div>
+            </div>
+            <div class="quiz-record-actions">
+              <button class="quiz-action-btn" (click)="openQuizAnalysis(q)">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="3" width="18" height="18" rx="2"/>
+                  <path d="M8 17v-5M12 17v-9M16 17v-3"/>
+                </svg>
+                答題分析
+              </button>
+              <button class="quiz-action-btn" (click)="openQuizQuestions(q)">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
+                  <rect x="9" y="3" width="6" height="4" rx="1"/>
+                  <path d="M9 12h6M9 16h4"/>
+                </svg>
+                查看題目
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 答題分析模式 -->
+      <div class="quiz-detail-panel" *ngIf="quizDetailMode === 'analysis' && selectedQuiz">
+        <div class="quiz-score-banner">
+          <div class="quiz-score-circle">
+            <div class="quiz-score-num">{{ selectedQuiz.score }}</div>
+            <div class="quiz-score-total">/ {{ selectedQuiz.totalScore }}</div>
+          </div>
+          <div class="quiz-score-info">
+            <div class="quiz-score-pct">得分率 {{ (selectedQuiz.score / selectedQuiz.totalScore * 100).toFixed(0) }}%</div>
+            <div class="quiz-score-meta">{{ selectedQuiz.date }} · {{ selectedQuiz.duration }}</div>
+          </div>
+        </div>
+        <div class="quiz-no-detail" *ngIf="!selectedQuiz.questions || selectedQuiz.questions.length === 0">
+          <p>暫無詳細答題記錄</p>
+        </div>
+        <div class="quiz-analysis-list" *ngIf="selectedQuiz.questions && selectedQuiz.questions.length > 0">
+          <div class="quiz-analysis-item" *ngFor="let q of selectedQuiz.questions"
+               [class.correct]="q.correct" [class.wrong]="!q.correct">
+            <div class="analysis-index">{{ q.index }}</div>
+            <div class="analysis-body">
+              <div class="analysis-q">{{ q.question }}</div>
+              <div class="analysis-ans">
+                <span class="ans-label">你的答案：</span>{{ q.userAnswer }}
+                <span class="ans-correct" *ngIf="q.correct">✓ 正確</span>
+                <span class="ans-wrong" *ngIf="!q.correct">✗ 正確答案：{{ q.answer }}</span>
+              </div>
+              <div class="analysis-exp" *ngIf="q.explanation">💡 {{ q.explanation }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 查看題目模式 -->
+      <div class="quiz-detail-panel" *ngIf="quizDetailMode === 'questions' && selectedQuiz">
+        <div class="quiz-no-detail" *ngIf="!selectedQuiz.questions || selectedQuiz.questions.length === 0">
+          <p>暫無題目記錄</p>
+        </div>
+        <div class="quiz-question-list" *ngIf="selectedQuiz.questions && selectedQuiz.questions.length > 0">
+          <div class="quiz-question-item" *ngFor="let q of selectedQuiz.questions">
+            <div class="question-header">
+              <span class="question-num">第 {{ q.index }} 題</span>
+              <span class="question-badge correct-badge" *ngIf="q.correct">✓ 答對</span>
+              <span class="question-badge wrong-badge" *ngIf="!q.correct">✗ 答錯</span>
+            </div>
+            <div class="question-text">{{ q.question }}</div>
+            <div class="question-options">
+              <div class="question-option" *ngFor="let opt of q.options; let i = index"
+                   [class.opt-correct]="opt === q.answer"
+                   [class.opt-user]="opt === q.userAnswer && opt !== q.answer">
+                {{ ['A','B','C','D'][i] }}. {{ opt }}
+              </div>
+            </div>
+            <div class="question-exp" *ngIf="q.explanation">💡 {{ q.explanation }}</div>
+          </div>
+        </div>
+      </div>
+
     </div>
 
     <!-- ══ 聊天 ══ -->

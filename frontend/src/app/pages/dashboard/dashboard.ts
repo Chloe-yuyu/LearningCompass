@@ -38,6 +38,27 @@ interface UploadedFile {
 
 type FunctionType = 'chat' | 'summary' | 'quiz' | 'ppt';
 
+interface QuizRecord {
+  id: string;
+  title: string;
+  date: string;
+  duration: string;
+  totalScore: number;
+  score: number;
+  status: '已完成' | '未完成';
+  questions?: QuizQuestion[];
+}
+
+interface QuizQuestion {
+  index: number;
+  question: string;
+  options: string[];
+  answer: string;
+  userAnswer: string;
+  correct: boolean;
+  explanation: string;
+}
+
 @Component({
   selector: 'app-dashboard',
   imports: [CommonModule, RouterLink, FormsModule, MatSnackBarModule],
@@ -66,8 +87,13 @@ export class Dashboard implements OnInit, AfterViewChecked {
   // 功能選擇
   selectedFunction: FunctionType = 'chat';
 
-  // 頁面狀態（四個視圖）
-  activeView: 'chat' | 'upload' | 'materials' | 'profile' = 'chat';
+  // 頁面狀態
+  activeView: 'chat' | 'upload' | 'materials' | 'profile' | 'quiz' = 'chat';
+
+  // 測驗紀錄
+  quizRecords: QuizRecord[] = [];
+  selectedQuiz: QuizRecord | null = null;
+  quizDetailMode: 'list' | 'analysis' | 'questions' = 'list';
 
   // 上傳
   pendingUploadFile: File | null = null;
@@ -187,11 +213,47 @@ export class Dashboard implements OnInit, AfterViewChecked {
   }
 
   // ── 視圖切換 ──
-  setView(view: 'chat' | 'upload' | 'materials' | 'profile') {
+  setView(view: 'chat' | 'upload' | 'materials' | 'profile' | 'quiz') {
     this.activeView = view;
     if (view === 'profile') this.loadProfileData();
     if (view === 'upload') this.pendingUploadFile = null;
+    if (view === 'quiz') { this.loadQuizRecords(); this.quizDetailMode = 'list'; this.selectedQuiz = null; }
     this.showUserMenu = false;
+  }
+
+  loadQuizRecords() {
+    if (!this.userEmail) return;
+    this.http.get<any>(`http://localhost:5000/quiz/list?user_email=${encodeURIComponent(this.userEmail)}`).subscribe({
+      next: (res) => {
+        const records = Array.isArray(res) ? res : (res.records || []);
+        this.quizRecords = records.map((r: any) => ({
+          id: r.id || r._id || '',
+          title: r.title || r.material_name || '未命名測驗',
+          date: r.created_at ? new Date(r.created_at).toLocaleDateString('zh-TW', { month: 'numeric', day: 'numeric' }) : '--',
+          duration: r.duration || '60 分鐘',
+          totalScore: r.total_score || 100,
+          score: r.score ?? 85,
+          status: r.status === 'completed' ? '已完成' : '未完成',
+          questions: r.questions || []
+        }));
+      },
+      error: () => {}
+    });
+  }
+
+  openQuizAnalysis(quiz: QuizRecord) {
+    this.selectedQuiz = quiz;
+    this.quizDetailMode = 'analysis';
+  }
+
+  openQuizQuestions(quiz: QuizRecord) {
+    this.selectedQuiz = quiz;
+    this.quizDetailMode = 'questions';
+  }
+
+  backToQuizList() {
+    this.selectedQuiz = null;
+    this.quizDetailMode = 'list';
   }
 
   backToChat() {

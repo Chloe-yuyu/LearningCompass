@@ -1059,3 +1059,203 @@
   font-weight: 900;
   color: var(--primary-dk);
 }
+
+/* ══════════════════════════════
+   Topbar 測驗紀錄 Tab
+══════════════════════════════ */
+.topbar-tab-btn {
+  font-family: var(--font);
+  font-size: 13px; font-weight: 800;
+  padding: 7px 16px;
+  border: 2px solid var(--border);
+  border-radius: 20px;
+  background: #fff;
+  color: var(--text-md);
+  cursor: pointer;
+  display: flex; align-items: center; gap: 6px;
+  transition: all 0.15s;
+}
+.topbar-tab-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary-dk);
+  background: var(--primary-bg);
+}
+
+/* ══════════════════════════════
+   測驗紀錄視圖
+══════════════════════════════ */
+.quiz-view {
+  flex: 1;
+  overflow-y: auto;
+  background: var(--bg);
+}
+
+/* 列表 */
+.quiz-list-panel {
+  padding: 28px 32px;
+  max-width: 820px;
+  margin: 0 auto;
+}
+
+.quiz-empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-md);
+}
+.quiz-empty h3 { font-size: 20px; font-weight: 900; margin-bottom: 8px; }
+.quiz-empty p  { font-size: 14px; font-weight: 600; }
+
+.quiz-record-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.quiz-record-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: #fff;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  box-shadow: 0 3px 0 var(--border);
+  transition: box-shadow 0.15s, transform 0.15s;
+}
+.quiz-record-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 0 var(--border);
+}
+
+.quiz-record-info { flex: 1; min-width: 0; }
+.quiz-record-title {
+  font-size: 16px; font-weight: 900;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+.quiz-record-meta {
+  font-size: 13px; font-weight: 600;
+  color: var(--text-md);
+}
+.quiz-done   { color: var(--primary); font-weight: 900; }
+.quiz-pending{ color: var(--warning); font-weight: 900; }
+
+.quiz-record-actions {
+  display: flex; gap: 10px; flex-shrink: 0;
+}
+.quiz-action-btn {
+  font-family: var(--font);
+  font-size: 13px; font-weight: 800;
+  padding: 8px 14px;
+  border: 2px solid var(--primary-bd);
+  border-radius: var(--radius-sm);
+  background: var(--primary-bg);
+  color: var(--primary-dk);
+  cursor: pointer;
+  display: flex; align-items: center; gap: 6px;
+  transition: all 0.15s;
+  box-shadow: 0 2px 0 var(--primary-bd);
+}
+.quiz-action-btn:hover {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary-dk);
+  transform: translateY(1px);
+  box-shadow: 0 1px 0 var(--primary-dk);
+}
+
+/* 詳情面板共用 */
+.quiz-detail-panel {
+  padding: 24px 32px;
+  max-width: 820px;
+  margin: 0 auto;
+}
+.quiz-no-detail {
+  text-align: center;
+  padding: 60px;
+  color: var(--text-lt);
+  font-weight: 700;
+}
+
+/* 分數 banner */
+.quiz-score-banner {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  background: #fff;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px 28px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 0 var(--border);
+}
+.quiz-score-circle {
+  width: 80px; height: 80px; border-radius: 50%;
+  background: var(--primary);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 0 var(--primary-dk);
+}
+.quiz-score-num  { font-size: 26px; font-weight: 900; color: #fff; line-height: 1; }
+.quiz-score-total{ font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.8); }
+.quiz-score-pct  { font-size: 20px; font-weight: 900; color: var(--text); margin-bottom: 4px; }
+.quiz-score-meta { font-size: 13px; font-weight: 600; color: var(--text-md); }
+
+/* 答題分析列表 */
+.quiz-analysis-list {
+  display: flex; flex-direction: column; gap: 12px;
+}
+.quiz-analysis-item {
+  display: flex; gap: 14px;
+  background: #fff;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  border-left: 5px solid var(--border);
+}
+.quiz-analysis-item.correct { border-left-color: var(--primary); }
+.quiz-analysis-item.wrong   { border-left-color: var(--danger); }
+.analysis-index {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--bg); border: 2px solid var(--border);
+  font-size: 13px; font-weight: 900;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.analysis-body { flex: 1; }
+.analysis-q  { font-size: 14px; font-weight: 800; margin-bottom: 6px; }
+.analysis-ans{ font-size: 13px; font-weight: 600; color: var(--text-md); margin-bottom: 4px; }
+.ans-correct { color: var(--primary); font-weight: 900; margin-left: 8px; }
+.ans-wrong   { color: var(--danger);  font-weight: 900; margin-left: 8px; }
+.analysis-exp{ font-size: 12px; font-weight: 600; color: var(--text-lt); background: var(--bg); padding: 6px 10px; border-radius: 6px; }
+
+/* 查看題目列表 */
+.quiz-question-list { display: flex; flex-direction: column; gap: 18px; }
+.quiz-question-item {
+  background: #fff;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: 0 3px 0 var(--border);
+}
+.question-header {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+}
+.question-num { font-size: 13px; font-weight: 900; color: var(--text-md); }
+.question-badge {
+  font-size: 12px; font-weight: 800; padding: 2px 10px; border-radius: 12px;
+}
+.correct-badge { background: #e8f5e9; color: #2e7d32; }
+.wrong-badge   { background: #ffebee; color: #c62828; }
+.question-text { font-size: 15px; font-weight: 800; margin-bottom: 12px; }
+.question-options { display: flex; flex-direction: column; gap: 8px; }
+.question-option {
+  font-size: 13px; font-weight: 600; padding: 8px 14px;
+  border: 2px solid var(--border); border-radius: var(--radius-sm);
+  background: var(--bg);
+}
+.question-option.opt-correct { border-color: var(--primary); background: var(--primary-bg); color: var(--primary-dk); font-weight: 800; }
+.question-option.opt-user    { border-color: var(--danger);  background: #ffebee; color: #c62828; font-weight: 800; }
+.question-exp { font-size: 12px; font-weight: 600; color: var(--text-lt); margin-top: 10px; background: var(--bg); padding: 8px 12px; border-radius: 6px; }
